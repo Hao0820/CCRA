@@ -16,7 +16,7 @@ export default function LoginView({
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md items-center justify-center">
         <section className="w-full space-y-6 bg-[#fdf9e9]/95 p-7 text-center sketch-border sketch-shadow">
           <img
-            src="/branding/ccra-icon-192.png"
+            src="/branding/ccra-icon-192.png?v=2"
             alt="CCRA"
             className="mx-auto h-20 w-20 object-contain"
           />

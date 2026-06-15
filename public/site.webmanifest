@@ -8,12 +8,12 @@
   "theme_color": "#fdf9e9",
   "icons": [
     {
-      "src": "/branding/ccra-icon-192.png",
+      "src": "/branding/ccra-icon-192.png?v=2",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/branding/ccra-icon-512.png",
+      "src": "/branding/ccra-icon-512.png?v=2",
       "sizes": "512x512",
       "type": "image/png"
     }
