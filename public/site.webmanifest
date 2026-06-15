@@ -1,0 +1,21 @@
+{
+  "name": "CCRA 信用卡回饋與消費管理",
+  "short_name": "CCRA",
+  "description": "台灣信用卡回饋與消費管理工具",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf9e9",
+  "theme_color": "#fdf9e9",
+  "icons": [
+    {
+      "src": "/branding/ccra-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/branding/ccra-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

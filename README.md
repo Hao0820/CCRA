@@ -46,6 +46,17 @@ https://icard.ai/home/all_cards
 
 優惠期限、登錄資格、回饋上限與排除項目仍以發卡銀行最新公告為準。
 
+## 品牌圖示
+
+網站 icon 與 LINE 大頭貼位於：
+
+```text
+public/branding/
+```
+
+`ccra-line-avatar.png` 為 1024px LINE 大頭貼，其他尺寸供 favicon、
+Apple Touch Icon 與 Web App Manifest 使用。
+
 ## 本機開發
 
 環境需求：
