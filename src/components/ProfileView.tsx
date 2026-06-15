@@ -12,6 +12,7 @@ import {
   LogOut,
   Palette,
   RefreshCw,
+  User,
 } from 'lucide-react';
 import { calculateTransactionReward } from '../rewardUtils';
 
@@ -30,6 +31,8 @@ interface ProfileViewProps {
   syncStatus: 'loading' | 'syncing' | 'synced' | 'error';
   syncError?: string;
   lastSyncedAt?: Date | null;
+  uiTheme?: 'sketch' | 'comic';
+  onUpdateUiTheme?: (theme: 'sketch' | 'comic') => void;
   onRetrySync: () => void;
   onSignOut: () => void;
 }
@@ -49,6 +52,8 @@ export default function ProfileView({
   syncStatus,
   syncError,
   lastSyncedAt,
+  uiTheme = 'sketch',
+  onUpdateUiTheme,
   onRetrySync,
   onSignOut,
 }: ProfileViewProps) {
@@ -111,7 +116,11 @@ export default function ProfileView({
 
   return (
     <div className="space-y-6 font-handwriting text-left">
-      <section className="bg-[#c3ecd7]/35 p-4 sketch-border pencil-shadow">
+      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow">
+        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+          <User size={18} />
+          <span>帳號資訊</span>
+        </h3>
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             {authPictureUrl ? (
@@ -127,13 +136,13 @@ export default function ProfileView({
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-xs font-bold text-on-surface-variant">
+              <p className="text-sm font-bold text-on-surface-variant">
                 LINE 帳號與雲端同步
               </p>
-              <p className="truncate text-sm font-bold text-primary">
+              <p className="truncate text-base font-bold text-primary">
                 {authUserName || 'LINE 使用者'}
               </p>
-              <p className="text-[11px] text-on-surface-variant">
+              <p className="text-xs text-on-surface-variant">
                 {syncLabel}
               </p>
             </div>
@@ -142,7 +151,7 @@ export default function ProfileView({
           <button
             type="button"
             onClick={onSignOut}
-            className="flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-xs font-bold text-[#ba1a1a] sketch-border-sm"
+            className="flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-sm font-bold text-[#ba1a1a] sketch-border-sm"
           >
             <LogOut size={14} />
             登出
@@ -167,29 +176,30 @@ export default function ProfileView({
         )}
       </section>
 
-      <section className="bg-white/60 p-4 sketch-border pencil-shadow">
+      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow">
+        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+          <Banknote size={18} />
+          <span>現金餘額</span>
+        </h3>
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fcf5c7] sketch-border-sm">
-              <Banknote size={20} className="text-[#846b12]" />
-            </div>
             <div>
-              <p className="text-xs font-bold text-on-surface-variant">現金餘額</p>
+              <p className="text-sm font-bold text-on-surface-variant hidden">現金餘額</p>
               {editingCash ? (
                 <form onSubmit={handleSaveCash} className="mt-1 flex items-center gap-2">
-                  <span className="text-sm font-bold font-sans">{currencySymbol}</span>
+                  <span className="text-base font-bold font-sans">{currencySymbol}</span>
                   <input
                     autoFocus
                     type="number"
                     value={cashInput}
                     onChange={(e) => setCashInput(e.target.value)}
-                    className="w-28 border-b-2 border-outline bg-transparent py-0.5 text-sm font-bold font-sans focus:border-primary focus:outline-none"
+                    className="w-28 border-b-2 border-outline bg-transparent py-0.5 text-base font-bold font-sans focus:border-primary focus:outline-none"
                   />
-                  <button type="submit" className="bg-[#c3ecd7] px-2 py-0.5 text-xs font-bold sketch-border-sm">確認</button>
-                  <button type="button" onClick={() => setEditingCash(false)} className="bg-white px-2 py-0.5 text-xs font-bold sketch-border-sm">取消</button>
+                  <button type="submit" className="bg-[#c3ecd7] px-3 py-1 text-sm font-bold sketch-border-sm">確認</button>
+                  <button type="button" onClick={() => setEditingCash(false)} className="bg-white px-3 py-1 text-sm font-bold sketch-border-sm">取消</button>
                 </form>
               ) : (
-                <p className="text-lg font-bold text-primary font-sans">
+                <p className="text-xl font-bold text-primary font-sans">
                   {currencySymbol} {cashBalance.toLocaleString()}
                 </p>
               )}
@@ -201,7 +211,7 @@ export default function ProfileView({
                 setCashInput(String(cashBalance));
                 setEditingCash(true);
               }}
-              className="shrink-0 bg-white px-2 py-0.5 text-xs font-bold sketch-border-sm"
+              className="shrink-0 bg-white px-3 py-1 text-sm font-bold sketch-border-sm"
             >
               編輯
             </button>
@@ -210,14 +220,14 @@ export default function ProfileView({
       </section>
 
       {/* Credit card limit summary */}
-      <section className="bg-surface-container-low p-5 sketch-border pencil-shadow space-y-4">
+      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow space-y-4">
+        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+          <CreditCard size={18} />
+          <span>信用卡</span>
+        </h3>
         <div>
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <p className="flex items-center gap-1.5 text-sm font-bold text-primary">
-              <CreditCard size={17} />
-              信用卡
-            </p>
-            <span className="text-xs font-bold text-on-surface-variant">
+          <div className="mb-2 flex items-center justify-end gap-3">
+            <span className="text-sm font-bold text-on-surface-variant">
               總額度：
               <span className="font-sans text-primary">
                 {currencySymbol} {totalCreditLimit.toLocaleString()}
@@ -230,58 +240,84 @@ export default function ProfileView({
               className="h-full rounded-full bg-[var(--accent-bg)] transition-all duration-500 sketch-border-sm"
               style={{ width: `${clampedCreditUsage}%` }}
             />
-            <span className="absolute inset-0 text-[10px] font-sans font-bold flex items-center justify-center text-primary">
+            <span className="absolute inset-0 text-xs font-sans font-bold flex items-center justify-center text-primary">
               {creditUsagePercent.toFixed(1)}%
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-bold text-on-surface-variant border-t border-dashed border-[#75777d]/30">
-          <div>
-            <p>本月刷卡：<span className="font-sans text-[#ba1a1a] text-sm">{currencySymbol} {selectedMonthCardSpent.toLocaleString()}</span></p>
-            <p>剩餘額度：<span className="font-sans text-primary text-sm">{currencySymbol} {Math.max(totalCreditLimit - selectedMonthCardSpent, 0).toLocaleString()}</span></p>
+        <div className="grid grid-cols-2 gap-2 pt-2 text-sm font-bold text-on-surface-variant border-t border-dashed border-[#75777d]/30">
+          <div className="space-y-1">
+            <p>本月刷卡：<span className="font-sans text-[#ba1a1a] text-base">{currencySymbol} {selectedMonthCardSpent.toLocaleString()}</span></p>
+            <p>剩餘額度：<span className="font-sans text-primary text-base">{currencySymbol} {Math.max(totalCreditLimit - selectedMonthCardSpent, 0).toLocaleString()}</span></p>
           </div>
-          <div>
-            <p>持卡數量：<span className="font-sans text-primary text-sm underline">{cards.length}</span> 張</p>
-            <p>累積回饋點數：<span className="font-sans text-secondary text-sm">{selectedMonthPoints.toLocaleString()}</span> pts</p>
+          <div className="space-y-1">
+            <p>持卡數量：<span className="font-sans text-primary text-base underline">{cards.length}</span> 張</p>
+            <p>累積回饋點數：<span className="font-sans text-secondary text-base">{selectedMonthPoints.toLocaleString()}</span> pts</p>
           </div>
         </div>
       </section>
-
-      <section className="bg-white/50 p-5 sketch-border pencil-shadow space-y-3">
-        <h3 className="font-display text-md font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2">
-          <Palette size={16} />
-          <span>輔色選擇</span>
+      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow space-y-5">
+        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+          <Palette size={18} />
+          <span>個人化設定</span>
         </h3>
-        <p className="text-xs text-on-surface-variant">
-          套用於目前選中的 TAB、主要操作按鈕與重點資訊。
-        </p>
-        <div className="grid grid-cols-5 gap-3">
-          {(Object.keys(ACCENT_COLORS) as AccentColor[]).map((color) => {
-            const palette = ACCENT_COLORS[color];
-            return (
-              <button
-                key={color}
-                type="button"
-                onClick={() => onUpdateAccentColor(color)}
-                aria-label={`選擇${color}輔色`}
-                className="flex h-14 items-center justify-center rounded-sm border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95"
-                style={{ backgroundColor: palette.background }}
-              >
-                {accentColor === color && (
-                  <span
-                    className="h-3 w-3 rounded-full border border-black/20"
-                    style={{ backgroundColor: palette.text }}
-                  />
-                )}
-              </button>
-            );
-          })}
+        
+        <div className="space-y-3">
+          <p className="text-sm text-on-surface-variant font-bold">
+            輔色選擇
+          </p>
+          <div className="grid grid-cols-5 gap-3">
+            {(Object.keys(ACCENT_COLORS) as AccentColor[]).map((color) => {
+              const palette = ACCENT_COLORS[color];
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => onUpdateAccentColor(color)}
+                  aria-label={`選擇${color}輔色`}
+                  className="flex h-14 items-center justify-center rounded-sm border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95"
+                  style={{ backgroundColor: palette.background }}
+                >
+                  {accentColor === color && (
+                    <span
+                      className="h-3 w-3 rounded-full border border-black/20"
+                      style={{ backgroundColor: palette.text }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-sm text-on-surface-variant font-bold">
+            介面風格
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => onUpdateUiTheme?.('sketch')}
+              className={`flex flex-col items-center justify-center p-3 gap-2 rounded-md transition-all sketch-border-sm ${uiTheme === 'sketch' ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-2 border-primary' : 'bg-[var(--color-surface-bg)] border border-[#75777d]/30'}`}
+            >
+              <span className="text-2xl">📝</span>
+              <span className="text-sm font-bold text-on-surface">手繪風</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdateUiTheme?.('comic')}
+              className={`flex flex-col items-center justify-center p-3 gap-2 rounded-md transition-all sketch-border-sm ${uiTheme === 'comic' ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-2 border-primary' : 'bg-[var(--color-surface-bg)] border border-[#75777d]/30'}`}
+            >
+              <span className="text-2xl">💬</span>
+              <span className="text-sm font-bold text-on-surface font-display">漫畫風</span>
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Credits */}
-      <footer className="text-center pt-4 text-[10px] text-outline font-handwriting">
+      <footer className="text-center pt-4 text-xs text-outline font-handwriting font-bold">
         <p>Copyright © 2026 CCRA Inc</p>
       </footer>
     </div>

@@ -184,6 +184,7 @@ async function startLogin(request: Request) {
     nonce,
     code_challenge: challenge,
     code_challenge_method: 'S256',
+    disable_auto_login: 'true',
   }).toString();
 
   return redirect(authorizeUrl.toString(), [

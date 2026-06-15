@@ -44,6 +44,7 @@ export default function CardsView({
   onAddExpenseForCard,
 }: CardsViewProps) {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [viewRewardScenarioId, setViewRewardScenarioId] = useState<string>('');
   const [selectedRewardScenario, setSelectedRewardScenario] = useState<RewardScenario | null>(null);
   const [cardPendingDelete, setCardPendingDelete] = useState<Card | null>(null);
 
@@ -139,6 +140,17 @@ export default function CardsView({
     setCreditLimit('');
   };
 
+  const handleToggleCondition = (conditionKey: string) => {
+    if (!selectedCard) return;
+    const current = selectedCard.achievedConditions || [];
+    const newConditions = current.includes(conditionKey)
+      ? current.filter(c => c !== conditionKey)
+      : [...current, conditionKey];
+    const updatedCard = { ...selectedCard, achievedConditions: newConditions };
+    onUpdateCard(updatedCard);
+    setSelectedCard(updatedCard);
+  };
+
   // Alternate custom rotations based on code or index to mimic casual placement
   const getRotationClass = (index: number) => {
     const rotations = [
@@ -174,39 +186,73 @@ export default function CardsView({
     )?.rewardTargetSpend;
   };
 
-  const getBestScenarioProgress = (card: Card) => {
+  const getAllScenarioProgress = (card: Card) => {
     const candidates = getBestRewardScenarios(card).filter((scenario) => scenario.spendToCap);
     if (candidates.length === 0) {
       const target = getRewardTarget(card);
       return target
-        ? { spend: getCurrentMonthSpend(card.id), target }
-        : null;
+        ? [{ spend: getCurrentMonthSpend(card.id), target, label: '一般', rate: card.rewardRate }]
+        : [];
     }
 
-    return candidates
-      .map((scenario) => ({
-        spend: getCurrentMonthSpend(card.id, scenario.id),
-        target: scenario.spendToCap!,
-      }))
-      .sort((a, b) => (b.spend / b.target) - (a.spend / a.target))[0];
+    // Group scenarios with the same spendToCap together
+    // (e.g. SPO card has 網購+行動支付 both with spendToCap=10000 — they share a cap)
+    const grouped = new Map<number, { label: string; rate: number; ids: string[] }>();
+    for (const scenario of candidates) {
+      const key = scenario.spendToCap!;
+      if (grouped.has(key)) {
+        const existing = grouped.get(key)!;
+        // Keep highest rate, combine label if rate differs
+        if (scenario.rate > existing.rate) {
+          existing.rate = scenario.rate;
+          existing.label = scenario.label;
+        } else if (scenario.rate === existing.rate && !existing.label.includes(scenario.label)) {
+          existing.label = `${existing.label}/${scenario.label}`;
+        }
+        existing.ids.push(scenario.id);
+      } else {
+        grouped.set(key, { label: scenario.label, rate: scenario.rate, ids: [scenario.id] });
+      }
+    }
+
+    return Array.from(grouped.entries())
+      .map(([target, { label, rate, ids }]) => {
+        // For spend: sum across all scenarios in this group
+        const spend = ids.reduce(
+          (sum, id) => sum + getCurrentMonthSpend(card.id, id),
+          0
+        );
+        return { spend, target, label, rate };
+      })
+      .sort((a, b) => b.rate - a.rate);
+  };
+
+  const getBestScenarioProgress = (card: Card) => {
+    const all = getAllScenarioProgress(card);
+    return all.length > 0 ? all[0] : null;
   };
 
   const renderCardItem = (card: Card, index: number) => {
     const rotation = getRotationClass(index);
     const spend = getCardSpend(card.id);
     const bestScenario = getBestRewardScenario(card);
-    const progress = getBestScenarioProgress(card);
-    const remainingSpend = progress
-      ? Math.max(progress.target - progress.spend, 0)
-      : null;
+    const allProgress = getAllScenarioProgress(card);
 
     return (
       <div
         key={card.id}
-        onClick={() => setSelectedCard(card)}
-        className={`sketch-border sketch-shadow cursor-pointer transition-all duration-300 bg-white/90 ${rotation} hover:scale-[1.02] relative overflow-hidden aspect-[1.586/1]`}
+        onClick={() => {
+          setSelectedCard(card);
+          if (card.rewardScenarios && card.rewardScenarios.length > 0) {
+            setViewRewardScenarioId(card.rewardScenarios[0].id);
+          } else {
+            setViewRewardScenarioId('');
+          }
+        }}
+        className={`sketch-border sketch-shadow cursor-pointer transition-all duration-300 bg-white/90 ${rotation} hover:scale-[1.02] relative overflow-hidden`}
+        style={{ aspectRatio: '1.6 / 1', minHeight: '110px' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center bg-[#f8f4e4]">
+        <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-surface-container-low)]">
           {card.cardImage ? (
             <img
               src={card.cardImage}
@@ -215,38 +261,44 @@ export default function CardsView({
             />
           ) : (
             <div className="flex flex-col items-center gap-1 text-[#75777d]">
-              <CreditCard size={36} />
+              <CreditCard size={40} />
               <span className="text-[10px]">暫無卡面圖片</span>
             </div>
           )}
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/95 to-white/55 px-2.5 pt-5 pb-2">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/95 to-white/55 px-2.5 pt-6 pb-2.5">
           <div className="flex items-end justify-between gap-1">
             <div className="min-w-0">
-              <p className="truncate text-[12px] sm:text-sm font-bold text-primary font-display">
+              <p className="truncate text-base sm:text-lg font-bold text-primary font-display">
                 {card.name}
               </p>
-              <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-xs text-on-surface-variant font-bold">
-                <Coins size={12} className="opacity-75 shrink-0" />
+              <div className="mt-1 flex items-center gap-1 text-sm sm:text-base text-on-surface-variant font-bold">
+                <Coins size={16} className="opacity-75 shrink-0" />
                 <span className="truncate font-sans">
                   {card.currency} {spend.toLocaleString()}
                 </span>
               </div>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1">
-              {remainingSpend !== null && (
-                <span className={`rounded-full border border-black/10 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-bold ${
-                  remainingSpend === 0
-                    ? 'bg-[#c3ecd7] text-[#294e3f]'
-                    : 'bg-[#fcf5c7] text-[#846b12]'
-                }`}>
-                  {remainingSpend === 0
-                    ? '已刷滿'
-                    : `再刷 ${card.currency}${Math.ceil(remainingSpend).toLocaleString()}`}
-                </span>
-              )}
-              <span className="rounded-full bg-[var(--accent-bg)] border border-black/10 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-[var(--accent-text)]">
+              {allProgress.slice(0, 2).map((prog, i) => {
+                const remaining = Math.max(prog.target - prog.spend, 0);
+                return (
+                  <span
+                    key={i}
+                    className={`rounded-full border border-black/10 px-2.5 py-1 text-[11px] sm:text-xs font-bold font-sans ${
+                      remaining === 0
+                        ? 'bg-[#c3ecd7] text-[#294e3f]'
+                        : 'bg-[#fcf5c7] text-[#846b12]'
+                    }`}
+                  >
+                    {remaining === 0
+                      ? `[${prog.label}] 已刷滿`
+                      : `[${prog.label}] 再刷 ${card.currency}${Math.ceil(remaining).toLocaleString()}`}
+                  </span>
+                );
+              })}
+              <span className="rounded-full bg-[var(--accent-bg)] border border-black/10 px-2.5 py-1 text-xs sm:text-sm font-bold text-[var(--accent-text)]">
                 {bestScenario?.rate ?? card.rewardRate}%
               </span>
             </div>
@@ -254,14 +306,15 @@ export default function CardsView({
         </div>
 
         {card.isFavorite && (
-          <Heart size={16} fill="currentColor" className="absolute left-2 top-2 text-[#ba1a1a] drop-shadow-sm" />
+          <Heart size={20} fill="currentColor" className="absolute left-3 top-3 text-[#ba1a1a] drop-shadow-sm" />
         )}
-        <span className="absolute top-2 right-2 rounded-full bg-white/90 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold font-sans text-on-surface-variant shadow-sm">
+        <span className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-xs sm:text-sm font-bold font-sans text-on-surface-variant shadow-sm">
           ...{card.lastFour}
         </span>
       </div>
     );
   };
+
 
   return (
     <div className="space-y-8 font-handwriting">
@@ -278,7 +331,7 @@ export default function CardsView({
               我的最愛
             </h3>
             {favoriteCards.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-4">
                 {favoriteCards.map((card, index) => renderCardItem(card, index))}
               </div>
             ) : (
@@ -295,7 +348,7 @@ export default function CardsView({
               {bankKey}
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-4">
               {group.cards.map((card, idx) => renderCardItem(card, groupIndex + idx))}
             </div>
             
@@ -308,11 +361,11 @@ export default function CardsView({
       {/* Card Details Popup Modal */}
       {selectedCard && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 pb-24 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
           onClick={() => setSelectedCard(null)}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md max-h-[calc(100dvh-7rem)] overflow-y-auto p-4 transform scale-100 transition-all duration-300 relative rotate-1"
+            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[calc(100dvh-7rem)] overflow-y-auto p-4 transform scale-100 transition-all duration-300 relative rotate-1"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between gap-2 border-b border-outline border-dashed pb-2">
@@ -367,27 +420,54 @@ export default function CardsView({
                   <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
                     消費方式
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={viewRewardScenarioId}
+                    onChange={(e) => setViewRewardScenarioId(e.target.value)}
+                    className="w-full border-2 border-outline rounded-md focus:border-primary focus:outline-none bg-white p-2 text-sm font-bold font-sans mb-3"
+                  >
                     {selectedCard.rewardScenarios.map((scenario) => (
-                      <button
-                        key={scenario.id}
-                        type="button"
-                        onClick={() => setSelectedRewardScenario(scenario)}
-                        className="rounded-md border border-[#75777d]/20 bg-white/50 p-2 text-left transition-colors hover:bg-[var(--accent-bg)]/30"
-                      >
-                          <div className="flex items-center justify-between gap-2 text-xs font-bold">
-                            <span>{scenario.label}</span>
-                            <span className="text-secondary font-sans">{scenario.rate}%</span>
-                          </div>
-                          <p className="mt-1 line-clamp-2 text-[9px] leading-relaxed text-[#846b12]">
-                            {scenario.limit}
-                          </p>
-                          <p className="mt-1 text-[9px] font-bold text-secondary">
-                            點選查看規則 ＋
-                          </p>
-                      </button>
+                      <option key={scenario.id} value={scenario.id}>
+                        {scenario.label} ({scenario.rate}%)
+                      </option>
                     ))}
-                  </div>
+                  </select>
+
+                  {(() => {
+                    const scenario = selectedCard.rewardScenarios.find(s => s.id === viewRewardScenarioId);
+                    if (!scenario) return null;
+                    const TRIVIAL_CONDITIONS = ['當月有消費、不限金額', '需消費', '不限金額'];
+                    const realConditions = (scenario.conditions ?? []).filter(
+                      (c) => !TRIVIAL_CONDITIONS.includes(c.trim())
+                    );
+                    return (
+                      <div className="rounded-md border border-[#75777d]/20 bg-white/50 p-3 text-left">
+                        <div className="flex items-center justify-between gap-2 text-sm font-bold">
+                          <span>{scenario.label}</span>
+                          <span className="text-secondary font-sans">{scenario.rate}%</span>
+                        </div>
+                        {scenario.components && scenario.components.length > 0 && (
+                          <div className="mt-2 space-y-1 border-t border-dashed border-[#75777d]/20 pt-2">
+                            {scenario.components.map((comp, idx) => (
+                              <div key={idx} className="flex justify-between items-start text-xs">
+                                <span className="text-on-surface flex-1">├─ {comp.description}</span>
+                                <span className="text-primary font-bold whitespace-nowrap ml-2">{comp.rate}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {realConditions.length > 0 && (
+                          <div className="mt-3 bg-[var(--color-surface-container-low)] p-2.5 rounded-sm space-y-2 text-[11px] text-on-surface-variant">
+                            <p className="font-bold text-on-surface text-xs">需達成條件 (新增消費時可勾選)：</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                              {realConditions.map((cond, idx) => (
+                                <li key={idx} className="leading-snug">{cond}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -483,11 +563,12 @@ export default function CardsView({
 
       {selectedRewardScenario && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1c1c13]/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/70 backdrop-blur-sm"
           onClick={() => setSelectedRewardScenario(null)}
         >
           <div
-            className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[#fdf9e9] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+            className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-dashed border-outline pb-3">
               <p className="text-xs font-bold text-on-surface-variant">消費方式</p>
@@ -540,11 +621,11 @@ export default function CardsView({
 
       {cardPendingDelete && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1c1c13]/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/70 backdrop-blur-sm"
           onClick={() => setCardPendingDelete(null)}
         >
           <div
-            className="w-full max-w-sm bg-[#fdf9e9] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+            className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-3">
@@ -590,11 +671,11 @@ export default function CardsView({
       {/* Add Card Dialog */}
       {isAddingCard && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1c1c13]/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/60 backdrop-blur-sm"
           onClick={() => setIsAddingCard(false)}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative -rotate-[0.5deg]"
+            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative -rotate-[0.5deg]"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2 shrink-0">
@@ -716,7 +797,7 @@ export default function CardsView({
                   required
                   inputMode="numeric"
                   maxLength={4}
-                  placeholder="5678"
+                  placeholder="ex: 5678"
                   value={lastFour}
                   onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ''))}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 py-2 text-sm font-sans"
@@ -732,7 +813,7 @@ export default function CardsView({
                   required
                   min="0"
                   step="1000"
-                  placeholder="例如 100000"
+                  placeholder="ex: 100000"
                   value={creditLimit}
                   onChange={(e) => setCreditLimit(e.target.value)}
                   readOnly={existingBankLimit > 0}

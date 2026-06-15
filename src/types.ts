@@ -47,6 +47,7 @@ export interface Card {
   rewardLimitSummary?: string;
   rewardTargetSpend?: number;
   rewardScenarios?: RewardScenario[];
+  achievedConditions?: string[];
   isFavorite?: boolean;
 }
 
@@ -57,6 +58,7 @@ export interface Transaction {
   amount: number;
   cardId: string; // references Card.id
   rewardScenarioId?: string;
+  appliedRate?: number; // Snapshot of the rate applied at creation time
   category: 'shopping' | 'dining' | 'transport' | 'entertainment' | 'medical' | 'social' | 'home' | 'other';
   notes?: string;
   pointsOverride?: number; // optional manual points, otherwise calculated

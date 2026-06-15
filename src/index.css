@@ -96,3 +96,62 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ---------------------------------
+   COMIC THEME OVERRIDES
+   --------------------------------- */
+.theme-comic {
+  /* Swap handwriting for a bolder structural font */
+  --font-handwriting: "Bricolage Grotesque", sans-serif;
+  
+  /* Solid colors, no paper texture */
+  background-image: none;
+  background-color: #f4f4f4;
+  
+  --color-surface-bg: #ffffff;
+  --color-surface-dim: #e0e0e0;
+  --color-surface-bright: #ffffff;
+  --color-surface-container-low: #f8f9fa;
+  --color-surface-container: #ffffff;
+  --color-surface-container-high: #f1f3f4;
+  --color-surface-container-highest: #e8eaed;
+  --color-outline: #000000;
+  --color-on-surface-variant: #000000;
+}
+
+.theme-comic .sketch-border {
+  border: 3px solid #000000;
+  border-radius: 8px;
+}
+
+.theme-comic .sketch-border-sm {
+  border: 2px solid #000000;
+  border-radius: 4px;
+}
+
+.theme-comic .sketchy-border-bottom {
+  border-bottom: 3px solid #000000;
+  border-radius: 0;
+}
+
+.theme-comic .pencil-shadow {
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.theme-comic .pencil-shadow:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.theme-comic .sketch-shadow {
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.theme-comic .hand-line {
+  height: 3px;
+  background-color: #000000;
+  opacity: 1;
+  transform: none;
+  border-radius: 2px;
+}

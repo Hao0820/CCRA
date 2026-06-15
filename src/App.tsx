@@ -93,10 +93,21 @@ export default function App() {
     const now = new Date();
     return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
+  const [uiTheme, setUiTheme] = useState<'sketch' | 'comic'>(() => {
+    return (localStorage.getItem('ccra_ui_theme') as 'sketch' | 'comic') || 'sketch';
+  });
   const lineDisplayName =
     authUser?.user_metadata?.display_name ??
     authUser?.user_metadata?.name ??
     'LINE 使用者';
+
+  useEffect(() => {
+    if (uiTheme === 'comic') {
+      document.body.classList.add('theme-comic');
+    } else {
+      document.body.classList.remove('theme-comic');
+    }
+  }, [uiTheme]);
 
   useEffect(() => {
     [
@@ -546,7 +557,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen flex flex-col pt-20 pb-24 md:pb-8 max-w-screen-md mx-auto relative px-4"
+      className="min-h-screen flex flex-col pt-20 pb-24 md:pb-8 max-w-screen-md mx-auto relative px-4 font-sans transition-colors duration-300"
       style={{
         '--accent-bg': accent.background,
         '--accent-text': accent.text,
@@ -554,7 +565,7 @@ export default function App() {
     >
       
       {/* TopAppBar - Notebook Head Line */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#fdf9e9] border-b-2 border-[#75777d] border-dashed px-4 py-3 shadow-sm select-none">
+      <header className={`fixed top-0 left-0 right-0 z-40 bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
         <div className="flex justify-between items-center w-full max-w-screen-md mx-auto">
           {/* Symmetrical Left Spacer to keep title centered */}
           <div className="w-9 h-9" />
@@ -618,6 +629,7 @@ export default function App() {
             cashBalance={cashBalance}
             initialCardId={preselectedExpenseCardId}
             onClearInitialCard={() => setPreselectedExpenseCardId(null)}
+            onUpdateCard={handleUpdateCard}
           />
         )}
 
@@ -641,6 +653,11 @@ export default function App() {
             syncStatus={syncStatus}
             syncError={syncError}
             lastSyncedAt={lastSyncedAt}
+            uiTheme={uiTheme}
+            onUpdateUiTheme={(theme) => {
+              setUiTheme(theme);
+              localStorage.setItem('ccra_ui_theme', theme);
+            }}
             onRetrySync={() => setSyncRetryNonce((value) => value + 1)}
             onSignOut={() => {
               if (!supabase) return;
@@ -660,7 +677,7 @@ export default function App() {
       </main>
 
       {/* Bottom Sticky Tablet Navigator */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-[#fdf9e9] border-t-2 border-[#75777d] border-dashed select-none">
+      <nav className={`fixed bottom-0 left-0 right-0 z-50 pb-safe bg-[var(--color-surface-bg)] border-t-2 border-outline select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
         <div className="flex justify-around items-center h-20 px-4 w-full max-w-screen-md mx-auto">
           
           {/* Tab 1: Expense */}

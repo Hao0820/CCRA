@@ -14,11 +14,26 @@ export function getBestRewardScenarios(card: Card): RewardScenario[] {
 }
 
 export function getTransactionRewardRate(transaction: Transaction, card?: Card): number {
+  if (transaction.appliedRate !== undefined) return transaction.appliedRate;
   if (!card) return 0;
   const scenario = card.rewardScenarios?.find(
     (item) => item.id === transaction.rewardScenarioId,
   );
-  return scenario?.rate ?? card.rewardRate;
+  if (!scenario) return card.rewardRate;
+
+  const TRIVIAL_CONDITIONS = ['當月有消費、不限金額', '需消費', '不限金額'];
+  const realConditions = (scenario.conditions ?? []).filter((c) => !TRIVIAL_CONDITIONS.includes(c.trim()));
+  
+  if (realConditions.length > 0) {
+    const allConditionsMet = realConditions.every((cond) => 
+      card.achievedConditions?.includes(`${scenario.id}-${cond}`)
+    );
+    if (!allConditionsMet) {
+      return card.rewardRate;
+    }
+  }
+
+  return scenario.rate;
 }
 
 export function calculateTransactionReward(transaction: Transaction, card?: Card): number {

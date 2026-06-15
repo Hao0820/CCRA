@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Card, Transaction } from '../types';
-import { calculateTransactionReward } from '../rewardUtils';
+import { calculateTransactionReward, getTransactionRewardRate } from '../rewardUtils';
 import { 
   Plus, 
   ShoppingCart, 
@@ -40,6 +40,7 @@ interface ExpensesViewProps {
   cashBalance: number;
   initialCardId: string | null;
   onClearInitialCard: () => void;
+  onUpdateCard?: (card: Card) => void;
 }
 
 export default function ExpensesView({
@@ -56,6 +57,7 @@ export default function ExpensesView({
   cashBalance,
   initialCardId,
   onClearInitialCard,
+  onUpdateCard,
 }: ExpensesViewProps) {
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -102,16 +104,19 @@ export default function ExpensesView({
       setMerchant('');
       setAmount('');
       setDate(today);
+      const fallbackCardId = cards.find((c) => c.isFavorite)?.id || 'cash';
       setCardId(
         initialCardId && cards.some((card) => card.id === initialCardId)
           ? initialCardId
-          : 'cash',
+          : fallbackCardId,
       );
       setRewardScenarioId('');
       setCategory('shopping');
       setNotes('');
+      setNotes('');
     }
-  }, [isAddingExpense, cards, initialCardId, today]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAddingExpense, initialCardId, today]);
 
   // Trigger editing popup
   const handleEditClick = (tx: Transaction) => {
@@ -187,15 +192,35 @@ export default function ExpensesView({
   const selectedPaymentCard = cards.find((card) => card.id === cardId);
   const rewardScenarios = selectedPaymentCard?.rewardScenarios ?? [];
 
+  const groupedScenarios = React.useMemo(() => {
+    const grouped = new Map<number | string, { label: string; id: string; original: RewardScenario }>();
+    for (const scenario of rewardScenarios) {
+      const key = scenario.spendToCap ?? scenario.id;
+      if (grouped.has(key)) {
+        const existing = grouped.get(key)!;
+        if (scenario.rate > existing.original.rate) {
+          existing.id = scenario.id;
+          existing.original = scenario;
+        }
+        if (!existing.label.includes(scenario.label)) {
+          existing.label = `${existing.label}/${scenario.label}`;
+        }
+      } else {
+        grouped.set(key, { label: scenario.label, id: scenario.id, original: scenario });
+      }
+    }
+    return Array.from(grouped.values());
+  }, [rewardScenarios]);
+
   React.useEffect(() => {
     if (cardId === 'cash') {
       setRewardScenarioId('');
       return;
     }
-    if (rewardScenarios.length > 0 && !rewardScenarios.some((item) => item.id === rewardScenarioId)) {
-      setRewardScenarioId(rewardScenarios[0].id);
+    if (groupedScenarios.length > 0 && !groupedScenarios.some((item) => item.id === rewardScenarioId)) {
+      setRewardScenarioId(groupedScenarios[0].id);
     }
-  }, [cardId, rewardScenarioId, rewardScenarios]);
+  }, [cardId, rewardScenarioId, groupedScenarios]);
 
   // Compute Total Rewards (points) for the selected month
   const totalRewardsPoints = filteredTransactions.reduce((sum, tx) => {
@@ -221,6 +246,17 @@ export default function ExpensesView({
     if (cardId !== 'cash' && !selectedCardObj) return;
 
     const amt = Number(amount);
+    // If card has scenarios but none is selected yet, pick the first one
+    const resolvedScenarioId =
+      cardId !== 'cash' && rewardScenarios.length > 0 && !rewardScenarioId
+        ? rewardScenarios[0].id
+        : rewardScenarioId;
+    const txRewardScenarioId = cardId === 'cash' ? undefined : resolvedScenarioId || undefined;
+    
+    // Calculate the appliedRate at creation time
+    const dummyTxForRate = { rewardScenarioId: txRewardScenarioId } as Transaction;
+    const finalRate = cardId !== 'cash' ? getTransactionRewardRate(dummyTxForRate, selectedCardObj) : 0;
+
     if (editingTransaction) {
       const updatedTx: Transaction = {
         ...editingTransaction,
@@ -228,7 +264,8 @@ export default function ExpensesView({
         date,
         amount: amt,
         cardId,
-        rewardScenarioId: cardId === 'cash' ? undefined : rewardScenarioId || undefined,
+        rewardScenarioId: txRewardScenarioId,
+        appliedRate: finalRate,
         category,
         notes: notes.trim() || undefined,
         pointsOverride: undefined,
@@ -241,7 +278,8 @@ export default function ExpensesView({
         date,
         amount: amt,
         cardId,
-        rewardScenarioId: cardId === 'cash' ? undefined : rewardScenarioId || undefined,
+        rewardScenarioId: txRewardScenarioId,
+        appliedRate: finalRate,
         category,
         notes: notes.trim() || undefined,
         pointsOverride: undefined,
@@ -272,7 +310,7 @@ export default function ExpensesView({
   return (
     <div className="space-y-6 font-handwriting">
       {/* Month Carousel Navbar */}
-      <section className="flex items-center justify-between py-1 bg-[#fcf5c7]/30 sketch-border-sm px-1.5 select-none">
+      <section className="flex items-center justify-between py-1 bg-[var(--color-surface-bg)] sketch-border-sm px-1.5 select-none">
         <button
           onClick={() => handleMonthShift('prev')}
           disabled={selectedMonth === monthsList[0]}
@@ -336,8 +374,8 @@ export default function ExpensesView({
       {/* Summary Score Blocks */}
       <section className="flex gap-4 flex-col sm:flex-row">
         {/* Total Expense card */}
-        <div className="flex-1 bg-surface-container-low p-4 sketch-border pencil-shadow transform -rotate-1 hover:rotate-0 transition-transform relative">
-          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+        <div className="flex-1 bg-[var(--color-surface-bg)] p-4 sketch-border pencil-shadow transform -rotate-1 hover:rotate-0 transition-transform relative">
+          <p className="text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1">
             當月總消費
           </p>
           <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1">
@@ -351,7 +389,7 @@ export default function ExpensesView({
 
         {/* Total Rewards points card */}
         <div className="flex-1 bg-[var(--accent-bg)] p-4 sketch-border pencil-shadow transform rotate-1 hover:rotate-0 transition-transform relative">
-          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+          <p className="text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1">
             累計回饋點數
           </p>
           <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1.5">
@@ -370,7 +408,7 @@ export default function ExpensesView({
           <h3 className="text-md font-bold text-on-surface-variant border-l-4 border-outline pl-2.5">
             {contentView === 'list' ? '消費列表' : '支出類別占比'}
           </h3>
-          <span className="text-center text-xs font-bold text-on-surface-variant">
+          <span className="text-center text-sm font-bold text-on-surface-variant">
             共 <span className="font-sans text-primary">{filteredTransactions.length}</span> 筆
           </span>
           <button
@@ -414,33 +452,35 @@ export default function ExpensesView({
                       <IconComp size={18} className={config.iconColor} />
                     </div>
 
-                    <div className="text-left">
-                      <p className="text-md font-bold text-on-surface line-clamp-1 pr-2">
+                    <div className="text-left flex flex-col gap-1.5">
+                      <p className="text-lg font-bold text-on-surface line-clamp-1 pr-2">
                         {tx.merchant}
                       </p>
                       
                       <div className="flex flex-wrap items-center gap-x-2 text-xs text-on-surface-variant">
-                        <span className="font-sans text-[11px]">
-                          {translateDateString(tx.date)}
-                        </span>
-                        
                         {isCash ? (
-                          <span className="px-1.5 py-0.25 sketch-border-sm scale-90 bg-[#fcf5c7] font-display text-[10px]">
+                          <span className="px-1.5 py-0.5 sketch-border-sm bg-[#fcf5c7] font-display text-xs">
                             現金
                           </span>
                         ) : pairedCard && (
                           <>
-                            <span className={`px-1.5 py-0.25 sketch-border-sm scale-90 bg-white/60 font-display text-[10px]`}>
+                            <span className={`px-1.5 py-0.5 sketch-border-sm bg-white/60 font-display text-xs`}>
                               {pairedCard.name} ({pairedCard.lastFour})
                             </span>
                             {rewardScenario && (
-                              <span className="text-[10px] font-bold text-secondary">
+                              <span className="text-xs font-bold text-secondary">
                                 {rewardScenario.label} {rewardScenario.rate}%
                               </span>
                             )}
                           </>
                         )}
+                      </div>
 
+                      <div className="flex flex-wrap items-center gap-x-2 text-xs text-on-surface-variant">
+                        <span className="font-sans text-xs">
+                          {translateDateString(tx.date)}
+                        </span>
+                        
                         {tx.notes && (
                           <span className="italic text-outline opacity-80 max-w-[120px] line-clamp-1">
                             -{tx.notes}
@@ -451,34 +491,23 @@ export default function ExpensesView({
                   </div>
 
                   <div className="text-right flex items-center gap-4">
-                    <div>
-                      <p className="text-[17px] font-bold text-[#ba1a1a] font-sans">
+                    <div className="flex flex-col gap-1 text-right">
+                      <p className="text-[20px] font-bold text-[#ba1a1a] font-sans">
                         -{pairedCard?.currency || currencySymbol} {tx.amount.toLocaleString()}
                       </p>
-                      <p className="text-xs font-bold text-secondary flex items-center justify-end gap-0.5">
-                        <Coins size={12} className="text-[#765469]" />
+                      <p className="text-base font-bold text-secondary flex items-center justify-end gap-1">
+                        <Coins size={16} className="text-[#765469]" />
                         <span>+{calculatedPoints} pts</span>
                       </p>
                     </div>
 
-                    {/* Delete item directly */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTransactionPendingDelete(tx);
-                      }}
-                      className="text-outline/40 hover:text-[#ba1a1a] p-1 rounded-full hover:bg-neutral-200/50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                      title="刪除交易"
-                    >
-                      <Trash2 size={15} />
-                    </button>
                   </div>
                 </article>
               );
             })}
           </div>
         ) : (
-          <div className="space-y-3 bg-[#fcf5c7]/20 p-4 sketch-border pencil-shadow">
+          <div className="space-y-3 bg-[var(--color-surface-container-low)]/20 p-4 sketch-border pencil-shadow">
             {Object.entries(categorySpends).map(([categoryKey, total]) => {
               if (total === 0) return null;
               const config = categoryConfig[categoryKey as Transaction['category']];
@@ -492,7 +521,7 @@ export default function ExpensesView({
                       {currencySymbol} {total.toLocaleString()} ({share.toFixed(0)}%)
                     </span>
                   </div>
-                  <div className="h-3 w-full overflow-hidden rounded-md border border-outline bg-white p-0.5">
+                  <div className="h-3 w-full overflow-hidden rounded-md border border-outline bg-[var(--color-surface-bg)] p-0.5">
                     <div
                       className={`h-full rounded-sm ${config.bgClass} transition-all duration-500`}
                       style={{ width: `${share}%` }}
@@ -507,11 +536,11 @@ export default function ExpensesView({
 
       {transactionPendingDelete && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1c1c13]/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/70 backdrop-blur-sm"
           onClick={() => setTransactionPendingDelete(null)}
         >
           <div
-            className="w-full max-w-sm bg-[#fdf9e9] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+            className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-3">
@@ -533,7 +562,7 @@ export default function ExpensesView({
               <button
                 type="button"
                 onClick={() => setTransactionPendingDelete(null)}
-                className="px-4 py-2 sketch-border-sm bg-white hover:bg-[#ece8d9] text-xs font-bold"
+                className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-bg)] hover:bg-[var(--color-surface-variant)] text-xs font-bold"
               >
                 取消
               </button>
@@ -542,6 +571,7 @@ export default function ExpensesView({
                 onClick={() => {
                   onDeleteTransaction(transactionPendingDelete.id);
                   setTransactionPendingDelete(null);
+                  handleCloseModal();
                 }}
                 className="flex items-center gap-1.5 px-4 py-2 sketch-border-sm bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
               >
@@ -556,11 +586,11 @@ export default function ExpensesView({
       {/* Add Transaction Popup Modal */}
       {isAddingExpense && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
           onClick={handleCloseModal}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-sm max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative rotate-card-1"
+            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-sm max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative rotate-card-1"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2 shrink-0">
@@ -588,7 +618,7 @@ export default function ExpensesView({
                 <input
                   type="text"
                   required
-                  placeholder="例如 美聯社、星巴克"
+                  placeholder="ex: 早餐, 衣服"
                   value={merchant}
                   onChange={(e) => setMerchant(e.target.value)}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm"
@@ -603,7 +633,7 @@ export default function ExpensesView({
                   type="number"
                   required
                   min="1"
-                  placeholder="120"
+                  placeholder="ex: 1000"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm font-sans"
@@ -640,29 +670,82 @@ export default function ExpensesView({
                     消費方式 *
                   </label>
                   <select
-                    required
                     value={rewardScenarioId}
                     onChange={(e) => setRewardScenarioId(e.target.value)}
                     className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-sm"
                   >
-                    {rewardScenarios.map((scenario) => (
-                      <option key={scenario.id} value={scenario.id}>
-                        {scenario.label}（{scenario.rate}%）
+                    {groupedScenarios.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.label}
                       </option>
                     ))}
                   </select>
-                  {rewardScenarios.find((item) => item.id === rewardScenarioId)?.description && (
-                    <div className="mt-1 space-y-0.5 text-[10px] leading-relaxed text-on-surface-variant">
-                      <p>
-                        <span className="font-bold text-on-surface">規則：</span>
-                        {rewardScenarios.find((item) => item.id === rewardScenarioId)?.rule}
-                      </p>
-                      <p className="text-[#846b12]">
-                        <span className="font-bold">上限：</span>
-                        {rewardScenarios.find((item) => item.id === rewardScenarioId)?.limit}
-                      </p>
-                    </div>
-                  )}
+                  {(() => {
+                    const selectedScenario = groupedScenarios.find((item) => item.id === rewardScenarioId)?.original;
+                    if (!selectedScenario) return null;
+                    const card = cards.find(c => c.id === cardId);
+
+                    // Filter out trivial "just spend" conditions
+                    const TRIVIAL_CONDITIONS = [
+                      '當月有消費、不限金額',
+                      '需消費',
+                      '不限金額',
+                    ];
+                    const realConditions = (selectedScenario.conditions ?? []).filter(
+                      (c) => !TRIVIAL_CONDITIONS.includes(c.trim())
+                    );
+                    const hasRealConditions = realConditions.length > 0;
+
+                    return (
+                      <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
+                        {selectedScenario.description && (
+                          <div>
+                            <span className="font-bold text-on-surface">規則：</span>
+                            {selectedScenario.rule}
+                          </div>
+                        )}
+                        {selectedScenario.limit && (
+                          <div className="text-[#846b12]">
+                            <span className="font-bold">上限：</span>
+                            {selectedScenario.limit}
+                          </div>
+                        )}
+                        {hasRealConditions && card && onUpdateCard && (
+                          <div className="bg-[var(--color-surface-container-low)] p-2 rounded-sm space-y-1.5 mt-2 border border-[#75777d]/20">
+                            <p className="font-bold text-on-surface text-xs">需達成條件：</p>
+                            {realConditions.map((cond, idx) => {
+                               const condKey = `${selectedScenario.id}-${cond}`;
+                               const isChecked = card.achievedConditions?.includes(condKey);
+                               return (
+                                 <label key={idx} className="flex items-start gap-1.5 cursor-pointer group">
+                                   <input 
+                                     type="checkbox" 
+                                     className="mt-0.5 w-3.5 h-3.5 rounded-sm border-outline accent-primary shrink-0" 
+                                     checked={isChecked} 
+                                     onChange={() => {
+                                       const current = card.achievedConditions || [];
+                                       const newConditions = current.includes(condKey)
+                                         ? current.filter(c => c !== condKey)
+                                         : [...current, condKey];
+                                       onUpdateCard({ ...card, achievedConditions: newConditions });
+                                     }} 
+                                   />
+                                   <span className="text-on-surface group-hover:text-primary transition-colors flex-1">{cond}</span>
+                                 </label>
+                               );
+                            })}
+                          </div>
+                        )}
+                        <div className="mt-3 p-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm font-bold text-center border border-black/10 text-xs shadow-sm">
+                          {(() => {
+                            const allConditionsMet = !hasRealConditions || realConditions.every(cond => card?.achievedConditions?.includes(`${selectedScenario.id}-${cond}`));
+                            const currentRate = allConditionsMet ? selectedScenario.rate : (card?.rewardRate ?? 0);
+                            return `目前預估回饋：${currentRate}%${allConditionsMet ? '' : ' (未滿足條件)'}`;
+                          })()}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -686,20 +769,33 @@ export default function ExpensesView({
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 sketch-border-sm hover:bg-[#ece8d9] text-xs font-bold"
-                  onClick={handleCloseModal}
-                >
-                  取消
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 text-xs font-bold pencil-shadow"
-                >
-                  {editingTransaction ? '確認修改' : '建立消費紀錄'}
-                </button>
+              <div className="flex justify-between items-center pt-2 border-t border-dashed border-[#75777d]/20 mt-4">
+                {editingTransaction ? (
+                  <button
+                    type="button"
+                    onClick={() => setTransactionPendingDelete(editingTransaction)}
+                    className="flex items-center gap-1.5 px-3 py-2 text-[#ba1a1a] hover:bg-[#ffdad6] rounded-sm text-xs font-bold transition-colors"
+                  >
+                    <Trash2 size={14} />
+                    刪除
+                  </button>
+                ) : <div />}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="px-4 py-2 sketch-border-sm hover:bg-[#ece8d9] text-xs font-bold"
+                    onClick={handleCloseModal}
+                  >
+                    取消
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 text-xs font-bold pencil-shadow"
+                  >
+                    {editingTransaction ? '確認修改' : '建立消費紀錄'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
