@@ -18,7 +18,7 @@ export default function LoginView({
           <img
             src="/branding/ccra-icon-192.png"
             alt="CCRA"
-            className="mx-auto h-20 w-20 rounded-2xl object-cover sketch-border-sm"
+            className="mx-auto h-20 w-20 object-contain"
           />
 
           <div className="space-y-2">
