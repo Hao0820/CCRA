@@ -24,12 +24,12 @@ database.
 ## Required GitHub Actions secrets
 
 - `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_ANON_KEY` (the publishable key or legacy anon public key)
 - `VITE_LINE_LOGIN_URL`
 
 ## Required Supabase Edge Function secrets
 
-- `LINE_CHANNEL_ID`
+- `LINE_CHANNEL_ID` (`2010393614` for the current LINE Login channel)
 - `LINE_CHANNEL_SECRET`
 - `APP_URL`
 

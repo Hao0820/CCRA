@@ -83,7 +83,7 @@ npm run preview
 
 ```dotenv
 VITE_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
 VITE_APP_URL="https://YOUR_GITHUB_NAME.github.io/YOUR_REPOSITORY"
 VITE_LINE_LOGIN_URL="https://YOUR_PROJECT.supabase.co/functions/v1/line-login"
 ```
@@ -140,7 +140,7 @@ Settings > Secrets and variables > Actions
 | Secret | 說明 |
 | --- | --- |
 | `VITE_SUPABASE_URL` | Supabase Project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase Anon Key |
+| `VITE_SUPABASE_ANON_KEY` | Supabase Publishable key；舊專案也可使用 `anon public` |
 | `VITE_LINE_LOGIN_URL` | LINE Login Edge Function URL |
 
 每次推送到 `main` 分支後，GitHub Actions 會自動檢查、建置並部署網站。
@@ -192,10 +192,20 @@ LINE Login 將採用 OAuth 2.0 Authorization Code Flow 搭配 PKCE：
 Supabase Edge Function Secrets 預計包含：
 
 ```text
-LINE_CHANNEL_ID
+LINE_CHANNEL_ID=2010393614
 LINE_CHANNEL_SECRET
 APP_URL
 ```
+
+新版 Supabase Dashboard 可在以下位置取得前端金鑰：
+
+```text
+Project Settings > API Keys > Publishable and secret API keys
+```
+
+請複製 `Publishable key`，通常以 `sb_publishable_` 開頭。若專案仍使用
+舊版金鑰，請開啟 `Legacy API Keys` 並複製 `anon public`。兩者都可以
+填入本專案的 `VITE_SUPABASE_ANON_KEY`。
 
 LINE Developers Console 的 Callback URL 必須設定為實際的 Edge Function
 callback URL，而 GitHub Pages 網址則用於登入完成後返回前端。
