@@ -55,9 +55,10 @@ export default function ProfileView({
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState(String(cashBalance));
 
+  const currentMonthStr = `${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}`;
   const selectedMonthTransactions = transactions.filter(
     (transaction) =>
-      transaction.date.slice(0, 7).replace('-', '/') === selectedMonth,
+      transaction.date.slice(0, 7).replace('-', '/') === currentMonthStr,
   );
   const selectedMonthCardSpent = selectedMonthTransactions
     .filter((transaction) => transaction.cardId !== 'cash')

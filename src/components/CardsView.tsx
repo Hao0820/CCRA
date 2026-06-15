@@ -594,14 +594,14 @@ export default function CardsView({
           onClick={() => setIsAddingCard(false)}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md p-6 transform scale-100 transition-all duration-300 relative -rotate-[0.5deg]"
+            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative -rotate-[0.5deg]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2">
+            <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2 shrink-0">
               新增信用卡
             </h3>
 
-            <form onSubmit={handleCreateCard} className="space-y-4 text-left">
+            <form onSubmit={handleCreateCard} className="space-y-4 text-left overflow-y-auto pr-2 pb-2">
               <div className="rounded-lg border border-[#75777d]/30 bg-[#f2eede]/60 p-3 text-xs text-on-surface-variant">
                 <div className="flex items-center gap-2 font-bold text-primary mb-1">
                   <Database size={16} />

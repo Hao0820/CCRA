@@ -560,14 +560,14 @@ export default function ExpensesView({
           onClick={handleCloseModal}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-sm p-6 transform scale-100 transition-all duration-300 relative rotate-card-1"
+            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-sm max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative rotate-card-1"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2">
+            <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2 shrink-0">
               {editingTransaction ? '修改消費紀錄' : '記錄新消費'}
             </h3>
 
-            <form onSubmit={handleCreateExpense} className="space-y-4 text-left">
+            <form onSubmit={handleCreateExpense} className="space-y-4 text-left overflow-y-auto pr-2 pb-2">
               <div>
                 <label className="block text-xs font-bold text-on-surface-variant mb-1">
                   日期 *

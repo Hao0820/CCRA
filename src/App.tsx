@@ -561,7 +561,7 @@ export default function App() {
 
           {/* Centered book branding */}
           <div className="text-center">
-            <h1 className="font-display text-[18px] font-bold text-primary tracking-tight">
+            <h1 className="font-display text-2xl font-black text-primary tracking-tight">
               {getHeaderTitleText()}
             </h1>
           </div>
