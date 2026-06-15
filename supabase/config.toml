@@ -1,0 +1,4 @@
+project_id = "gssfqmiynesmtvbmeklb"
+
+[functions.line-login]
+verify_jwt = false

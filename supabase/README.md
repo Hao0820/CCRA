@@ -31,7 +31,14 @@ database.
 
 - `LINE_CHANNEL_ID` (`2010393614` for the current LINE Login channel)
 - `LINE_CHANNEL_SECRET`
-- `APP_URL`
+- `APP_URL` (`https://hao0820.github.io/CCRA/`)
+- `ALLOWED_APP_URLS`
 
 Do not add the LINE channel secret or Supabase service-role key to GitHub Pages
 or any `VITE_` environment variable.
+
+The LINE Login callback URL is:
+
+```text
+https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login/callback
+```

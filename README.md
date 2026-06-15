@@ -188,7 +188,8 @@ Supabase Edge Function Secrets 預計包含：
 ```text
 LINE_CHANNEL_ID=2010393614
 LINE_CHANNEL_SECRET
-APP_URL
+APP_URL=https://hao0820.github.io/CCRA/
+ALLOWED_APP_URLS=https://hao0820.github.io/CCRA/,http://localhost:3000/
 ```
 
 新版 Supabase Dashboard 可在以下位置取得前端金鑰：
@@ -204,6 +205,30 @@ Project Settings > API Keys > Publishable and secret API keys
 LINE Developers Console 的 Callback URL 必須設定為實際的 Edge Function
 callback URL，而 GitHub Pages 網址則用於登入完成後返回前端。
 
+目前 CCRA 使用的 Callback URL：
+
+```text
+https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login/callback
+```
+
+請在 LINE Developers Console 的 LINE Login 頻道中，進入
+`LINE Login > Callback URL` 加入以上網址。
+
+重新產生 Channel Secret 後，請直接在自己的終端機執行，避免把 secret
+貼到聊天或提交至 GitHub：
+
+```powershell
+npx supabase secrets set LINE_CHANNEL_SECRET=你的新Secret
+```
+
+完成後可用以下網址確認 Function 設定狀態：
+
+```text
+https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login/health
+```
+
+回傳 `{"ok":true,"configured":true}` 表示 LINE Login 所需參數已齊全。
+
 ## 資料同步規劃
 
 正式接上後端時，會將目前的瀏覽器資料對應如下：
@@ -217,7 +242,9 @@ callback URL，而 GitHub Pages 網址則用於登入完成後返回前端。
 | `my_ledger_cards` | `user_cards` |
 | `my_ledger_txs` | `transactions` |
 
-第一次登入時可偵測本機資料並詢問使用者是否上傳，避免覆蓋既有的雲端資料。
+目前實作會在該 LINE 帳號尚無雲端信用卡與消費資料時，自動上傳瀏覽器
+現有資料；若雲端已有資料，則以雲端內容載入目前裝置。登入後的修改會自動
+同步名稱、預算、現金、輔色、信用卡及消費紀錄。
 
 ## 專案結構
 

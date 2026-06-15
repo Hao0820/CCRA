@@ -8,3 +8,4 @@ work/
 .env*
 !.env.example
 .supabase/
+supabase/.temp/

@@ -6,7 +6,15 @@
 import React, { useState } from 'react';
 import { AccentColor, Card, Transaction } from '../types';
 import { ACCENT_COLORS } from '../theme';
-import { Banknote, Palette, UserRound, Wallet } from 'lucide-react';
+import {
+  Banknote,
+  Cloud,
+  LogIn,
+  LogOut,
+  Palette,
+  UserRound,
+  Wallet,
+} from 'lucide-react';
 import { calculateTransactionReward } from '../rewardUtils';
 
 interface ProfileViewProps {
@@ -21,6 +29,13 @@ interface ProfileViewProps {
   onUpdateCashBalance: (amount: number) => void;
   accentColor: AccentColor;
   onUpdateAccentColor: (color: AccentColor) => void;
+  authUserName?: string;
+  authPictureUrl?: string;
+  isAuthenticated: boolean;
+  authLoading: boolean;
+  authError?: string;
+  onLineLogin: () => void;
+  onSignOut: () => void;
 }
 
 export default function ProfileView({
@@ -35,6 +50,13 @@ export default function ProfileView({
   onUpdateCashBalance,
   accentColor,
   onUpdateAccentColor,
+  authUserName,
+  authPictureUrl,
+  isAuthenticated,
+  authLoading,
+  authError,
+  onLineLogin,
+  onSignOut,
 }: ProfileViewProps) {
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState(String(budgetLimit));
@@ -124,6 +146,54 @@ export default function ProfileView({
 
   return (
     <div className="space-y-6 font-handwriting text-left">
+      <section className="bg-[#c3ecd7]/35 p-4 sketch-border pencil-shadow">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            {authPictureUrl ? (
+              <img
+                src={authPictureUrl}
+                alt=""
+                className="h-11 w-11 shrink-0 rounded-full object-cover sketch-border-sm"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#06c755] text-white sketch-border-sm">
+                <Cloud size={21} />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-on-surface-variant">
+                LINE 帳號與雲端同步
+              </p>
+              <p className="truncate text-sm font-bold text-primary">
+                {isAuthenticated
+                  ? `${authUserName || 'LINE 使用者'}，資料已連結 Supabase`
+                  : '登入後可跨裝置保存信用卡與消費資料'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            disabled={authLoading}
+            onClick={isAuthenticated ? onSignOut : onLineLogin}
+            className={`flex shrink-0 items-center gap-1 px-3 py-2 text-xs font-bold sketch-border-sm transition-opacity ${
+              isAuthenticated
+                ? 'bg-white text-[#ba1a1a]'
+                : 'bg-[#06c755] text-white'
+            } disabled:cursor-wait disabled:opacity-50`}
+          >
+            {isAuthenticated ? <LogOut size={14} /> : <LogIn size={14} />}
+            {authLoading ? '處理中' : isAuthenticated ? '登出' : 'LINE 登入'}
+          </button>
+        </div>
+        {authError && (
+          <p className="mt-3 border-t border-dashed border-[#ba1a1a]/30 pt-2 text-xs font-bold text-[#ba1a1a]">
+            {authError}
+          </p>
+        )}
+      </section>
+
       <section className="bg-white/60 p-4 sketch-border pencil-shadow">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
