@@ -34,11 +34,15 @@ export interface Card {
   bankName: string; // e.g., "臺灣銀行"
   name: string;      // e.g., "金采卡"
   lastFour: string;  // e.g., "1234"
+  creditLimit: number;
   rewardDesc: string; // e.g., "1% Cash Back everywhere"
   rewardRate: number; // e.g., 1 (for 1% or 1pt/yen)
   colorType: 'pink' | 'mint' | 'sky' | 'beige' | 'yellow' | 'purple';
   currency: 'NT$' | '¥' | '$' | '€';
   catalogCardId?: string;
+  catalogVariantId?: string;
+  cardLevel?: string;
+  cardNetworks?: string[];
   cardImage?: string;
   rewardLimitSummary?: string;
   rewardTargetSpend?: number;

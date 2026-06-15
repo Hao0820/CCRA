@@ -11,7 +11,11 @@ import CardsView from './components/CardsView';
 import ExpensesView from './components/ExpensesView';
 import ProfileView from './components/ProfileView';
 import LoginView from './components/LoginView';
-import { CREDIT_CARD_CATALOG } from './creditCardCatalog';
+import {
+  CreditCardCatalogItem,
+  CreditCardCatalogIssuer,
+  loadCreditCardCatalog,
+} from './creditCardCatalog';
 import {
   isSupabaseConfigured,
   LINE_LOGIN_URL,
@@ -19,18 +23,36 @@ import {
 } from './supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-function hydrateCardRewards(card: Card): Card {
-  const catalogCard = CREDIT_CARD_CATALOG.find(
+type SyncStatus = 'loading' | 'syncing' | 'synced' | 'error';
+
+function hydrateCardRewards(card: Card, catalog: CreditCardCatalogItem[]): Card {
+  const catalogCard = catalog.find(
     (item) =>
       item.id === card.catalogCardId ||
+      item.variants.some(
+        (variant) =>
+          variant.id === card.catalogVariantId ||
+          variant.id === card.catalogCardId,
+      ) ||
       (item.bankName === card.bankName &&
         (item.cardName === card.name ||
           card.name.includes(item.cardName) ||
           item.cardName.includes(card.name))),
   );
   if (!catalogCard) return card;
+  const variant =
+    catalogCard.variants.find(
+      (item) =>
+        item.id === card.catalogVariantId ||
+        item.id === card.catalogCardId,
+    ) ?? catalogCard.variants[0];
   return {
     ...card,
+    catalogCardId: catalogCard.id,
+    catalogVariantId: variant?.id,
+    cardLevel: variant?.cardLevel,
+    cardNetworks: variant?.cardNetworks,
+    cardImage: variant?.imageUrl ?? card.cardImage ?? catalogCard.imageUrl,
     rewardRate: catalogCard.rewardRate,
     rewardDesc: catalogCard.rewardDescription,
     rewardLimitSummary: catalogCard.rewardLimitSummary,
@@ -44,7 +66,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'expense' | 'cards' | 'profile'>('cards');
 
   // Ledger configuration
-  const [budgetLimit, setBudgetLimit] = useState(150000);
   const [cashBalance, setCashBalance] = useState(0);
   const [accentColor, setAccentColor] = useState<AccentColor>('pink');
   
@@ -58,6 +79,16 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(isSupabaseConfigured);
   const [authError, setAuthError] = useState('');
   const [cloudReadyUserId, setCloudReadyUserId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<CreditCardCatalogItem[]>([]);
+  const [catalogIssuers, setCatalogIssuers] = useState<CreditCardCatalogIssuer[]>([]);
+  const [catalogStatus, setCatalogStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogRetryNonce, setCatalogRetryNonce] = useState(0);
+  const [cloudRetryNonce, setCloudRetryNonce] = useState(0);
+  const [syncRetryNonce, setSyncRetryNonce] = useState(0);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('loading');
+  const [syncError, setSyncError] = useState('');
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
   const [selectedExpenseMonth, setSelectedExpenseMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -128,7 +159,37 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!supabase || !authUser) {
+    if (!authUser) {
+      setCatalogStatus('idle');
+      return;
+    }
+
+    let cancelled = false;
+    setCatalogStatus('loading');
+    setCatalogError('');
+
+    void loadCreditCardCatalog()
+      .then((loadedCatalog) => {
+        if (cancelled) return;
+        setCatalog(loadedCatalog.cards);
+        setCatalogIssuers(loadedCatalog.issuers);
+        setCatalogStatus('ready');
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setCatalogStatus('error');
+        setCatalogError(
+          error instanceof Error ? error.message : '信用卡資料載入失敗',
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, catalogRetryNonce]);
+
+  useEffect(() => {
+    if (!supabase || !authUser || catalogStatus !== 'ready') {
       setCloudReadyUserId(null);
       return;
     }
@@ -138,12 +199,14 @@ export default function App() {
     const loadCloudData = async () => {
       setAuthLoading(true);
       setAuthError('');
+      setSyncStatus('loading');
+      setSyncError('');
 
       const [profileResult, cardsResult, transactionsResult] =
         await Promise.all([
           supabase
             .from('profiles')
-            .select('display_name, monthly_budget, cash_balance, accent_color')
+            .select('display_name, cash_balance, accent_color')
             .eq('id', authUser.id)
             .single(),
           supabase
@@ -163,6 +226,8 @@ export default function App() {
       if (error) {
         if (!cancelled) {
           setAuthError(`雲端資料載入失敗：${error.message}`);
+          setSyncStatus('error');
+          setSyncError(`雲端資料載入失敗：${error.message}`);
           setAuthLoading(false);
         }
         return;
@@ -171,7 +236,7 @@ export default function App() {
       const cloudCards = (cardsResult.data ?? [])
         .map((row) => row.card_data as Card)
         .filter((card) => card?.id)
-        .map(hydrateCardRewards);
+        .map((card) => hydrateCardRewards(card, catalog));
       const cloudTransactions = (transactionsResult.data ?? [])
         .map((row) => row.transaction_data as Transaction)
         .filter((transaction) => transaction?.id);
@@ -180,16 +245,16 @@ export default function App() {
         setTransactions(cloudTransactions);
 
         const profile = profileResult.data;
-        const cloudBudget = Number(profile.monthly_budget);
         const cloudCash = Number(profile.cash_balance);
         const cloudAccent = profile.accent_color as AccentColor;
-        setBudgetLimit(cloudBudget);
         setCashBalance(cloudCash);
         if (ACCENT_COLORS[cloudAccent]) setAccentColor(cloudAccent);
       }
 
       if (!cancelled) {
         setCloudReadyUserId(authUser.id);
+        setSyncStatus('synced');
+        setLastSyncedAt(new Date());
         setAuthLoading(false);
       }
     };
@@ -198,17 +263,18 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [authUser]);
+  }, [authUser, catalog, catalogStatus, cloudRetryNonce]);
 
   useEffect(() => {
     if (!supabase || !authUser || cloudReadyUserId !== authUser.id) return;
 
     const timeout = window.setTimeout(() => {
       const syncCloudData = async () => {
+        setSyncStatus('syncing');
+        setSyncError('');
         const { error: profileError } = await supabase.from('profiles').upsert({
           id: authUser.id,
           display_name: lineDisplayName,
-          monthly_budget: budgetLimit,
           cash_balance: cashBalance,
           accent_color: accentColor,
         }, { onConflict: 'id' });
@@ -304,10 +370,14 @@ export default function App() {
         }
         const { error: deleteCardsError } = await deleteCards;
         if (deleteCardsError) throw deleteCardsError;
+
+        setSyncStatus('synced');
+        setLastSyncedAt(new Date());
       };
 
       void syncCloudData().catch((error: unknown) => {
-        setAuthError(
+        setSyncStatus('error');
+        setSyncError(
           `雲端同步失敗：${
             error instanceof Error ? error.message : '未知錯誤'
           }`,
@@ -319,11 +389,11 @@ export default function App() {
   }, [
     accentColor,
     authUser,
-    budgetLimit,
     cards,
     cashBalance,
     cloudReadyUserId,
     lineDisplayName,
+    syncRetryNonce,
     transactions,
   ]);
 
@@ -435,6 +505,42 @@ export default function App() {
   }
 
   if (cloudReadyUserId !== authUser.id) {
+    if (catalogStatus === 'error') {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="w-full max-w-sm bg-[#fdf9e9] p-6 text-center sketch-border sketch-shadow">
+            <p className="font-display text-lg font-bold text-primary">信用卡資料載入失敗</p>
+            <p className="mt-2 text-xs text-[#ba1a1a]">{catalogError}</p>
+            <button
+              type="button"
+              onClick={() => setCatalogRetryNonce((value) => value + 1)}
+              className="mt-4 bg-white px-4 py-2 text-xs font-bold sketch-border-sm"
+            >
+              重新載入
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (syncStatus === 'error') {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="w-full max-w-sm bg-[#fdf9e9] p-6 text-center sketch-border sketch-shadow">
+            <p className="font-display text-lg font-bold text-primary">雲端資料載入失敗</p>
+            <p className="mt-2 text-xs text-[#ba1a1a]">{syncError}</p>
+            <button
+              type="button"
+              onClick={() => setCloudRetryNonce((value) => value + 1)}
+              className="mt-4 bg-white px-4 py-2 text-xs font-bold sketch-border-sm"
+            >
+              重新載入
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return <LoginView loading error={authError} onLineLogin={handleLineLogin} />;
   }
 
@@ -481,6 +587,8 @@ export default function App() {
           <CardsView
             cards={cards}
             transactions={transactions}
+            catalog={catalog}
+            catalogIssuers={catalogIssuers}
             onAddCard={handleAddCard}
             onUpdateCard={handleUpdateCard}
             onDeleteCard={handleDeleteCard}
@@ -517,10 +625,6 @@ export default function App() {
           <ProfileView
             cards={cards}
             transactions={transactions}
-            budgetLimit={budgetLimit}
-            onUpdateBudget={(num) => {
-              setBudgetLimit(num);
-            }}
             currencySymbol={getDisplayCurrencySymbol()}
             cashBalance={cashBalance}
             onUpdateCashBalance={(amount) => {
@@ -530,9 +634,14 @@ export default function App() {
             onUpdateAccentColor={(color) => {
               setAccentColor(color);
             }}
+            selectedMonth={selectedExpenseMonth}
             authUserName={lineDisplayName}
             authPictureUrl={authUser?.user_metadata?.picture_url}
             authError={authError}
+            syncStatus={syncStatus}
+            syncError={syncError}
+            lastSyncedAt={lastSyncedAt}
+            onRetrySync={() => setSyncRetryNonce((value) => value + 1)}
             onSignOut={() => {
               if (!supabase) return;
               setAuthLoading(true);
@@ -540,6 +649,8 @@ export default function App() {
                 setCards([]);
                 setTransactions([]);
                 setCloudReadyUserId(null);
+                setSyncStatus('loading');
+                setSyncError('');
                 setAuthError(error?.message ?? '');
                 setAuthLoading(false);
               });

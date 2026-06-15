@@ -5,7 +5,10 @@
 
 import React, { useState } from 'react';
 import { Card, RewardScenario, Transaction } from '../types';
-import { CREDIT_CARD_CATALOG, CREDIT_CARD_ISSUERS } from '../creditCardCatalog';
+import {
+  CreditCardCatalogIssuer,
+  CreditCardCatalogItem,
+} from '../creditCardCatalog';
 import { CreditCard, Coins, Plus, Trash2, Award, Database, Heart, HeartPlus } from 'lucide-react';
 import {
   calculateTransactionReward,
@@ -16,6 +19,8 @@ import {
 interface CardsViewProps {
   cards: Card[];
   transactions: Transaction[];
+  catalog: CreditCardCatalogItem[];
+  catalogIssuers: CreditCardCatalogIssuer[];
   onAddCard: (card: Card) => void;
   onUpdateCard: (card: Card) => void;
   onDeleteCard: (cardId: string) => void;
@@ -28,6 +33,8 @@ interface CardsViewProps {
 export default function CardsView({
   cards,
   transactions,
+  catalog,
+  catalogIssuers,
   onAddCard,
   onUpdateCard,
   onDeleteCard,
@@ -43,10 +50,31 @@ export default function CardsView({
   // Form Fields
   const [issuerName, setIssuerName] = useState('');
   const [catalogCardId, setCatalogCardId] = useState('');
+  const [catalogVariantId, setCatalogVariantId] = useState('');
   const [lastFour, setLastFour] = useState('');
+  const [creditLimit, setCreditLimit] = useState('');
 
-  const availableCards = CREDIT_CARD_CATALOG.filter((card) => card.issuerName === issuerName);
-  const selectedCatalogCard = CREDIT_CARD_CATALOG.find((card) => card.id === catalogCardId);
+  const availableCards = catalog.filter((card) => card.issuerName === issuerName);
+  const selectedCatalogCard = catalog.find((card) => card.id === catalogCardId);
+  const selectedCatalogVariant =
+    selectedCatalogCard?.variants.find((variant) => variant.id === catalogVariantId) ??
+    selectedCatalogCard?.variants[0];
+  const existingBankLimit = selectedCatalogCard
+    ? Math.max(
+        ...cards
+          .filter((card) => card.bankCode === selectedCatalogCard.bankCode)
+          .map((card) => Number(card.creditLimit) || 0),
+        0,
+      )
+    : 0;
+
+  React.useEffect(() => {
+    if (!selectedCatalogCard) {
+      setCreditLimit('');
+      return;
+    }
+    setCreditLimit(existingBankLimit > 0 ? String(existingBankLimit) : '');
+  }, [existingBankLimit, selectedCatalogCard]);
 
   // Group cards by Bank Code
   const bankGroups: { [key: string]: { name: string; cards: Card[] } } = {};
@@ -75,7 +103,7 @@ export default function CardsView({
 
   const handleCreateCard = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCatalogCard || lastFour.length !== 4) return;
+    if (!selectedCatalogCard || lastFour.length !== 4 || Number(creditLimit) < 0) return;
 
     const newCard: Card = {
       id: `card-${Date.now()}`,
@@ -83,12 +111,16 @@ export default function CardsView({
       bankName: selectedCatalogCard.bankName,
       name: selectedCatalogCard.cardName,
       lastFour: lastFour.trim().slice(-4),
+      creditLimit: Number(creditLimit),
       rewardDesc: selectedCatalogCard.rewardDescription,
       rewardRate: selectedCatalogCard.rewardRate,
       colorType: 'beige',
       currency: 'NT$',
       catalogCardId: selectedCatalogCard.id,
-      cardImage: selectedCatalogCard.imageUrl,
+      catalogVariantId: selectedCatalogVariant?.id,
+      cardLevel: selectedCatalogVariant?.cardLevel,
+      cardNetworks: selectedCatalogVariant?.cardNetworks,
+      cardImage: selectedCatalogVariant?.imageUrl ?? selectedCatalogCard.imageUrl,
       rewardLimitSummary: selectedCatalogCard.rewardLimitSummary,
       rewardTargetSpend: selectedCatalogCard.rewardTargetSpend,
       rewardScenarios: selectedCatalogCard.rewardScenarios,
@@ -100,7 +132,9 @@ export default function CardsView({
     // Reset Form
     setIssuerName('');
     setCatalogCardId('');
+    setCatalogVariantId('');
     setLastFour('');
+    setCreditLimit('');
   };
 
   // Alternate custom rotations based on code or index to mimic casual placement
@@ -131,7 +165,11 @@ export default function CardsView({
 
   const getRewardTarget = (card: Card) => {
     if (card.rewardTargetSpend) return card.rewardTargetSpend;
-    return CREDIT_CARD_CATALOG.find((item) => item.id === card.catalogCardId)?.rewardTargetSpend;
+    return catalog.find(
+      (item) =>
+        item.id === card.catalogCardId ||
+        item.variants.some((variant) => variant.id === card.catalogVariantId),
+    )?.rewardTargetSpend;
   };
 
   const getBestScenarioProgress = (card: Card) => {
@@ -358,6 +396,22 @@ export default function CardsView({
                 <p className="text-sm font-sans font-bold text-on-surface">
                   •••• •••• •••• {selectedCard.lastFour || 'XXXX'}
                 </p>
+                {(selectedCard.cardNetworks?.length || selectedCard.cardLevel) && (
+                  <p className="mt-1 text-xs text-on-surface-variant">
+                    {[selectedCard.cardNetworks?.join(' / '), selectedCard.cardLevel]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  額度
+                </p>
+                <p className="text-sm font-sans font-bold text-on-surface">
+                  {selectedCard.currency} {(selectedCard.creditLimit ?? 0).toLocaleString()}
+                </p>
               </div>
 
               <div>
@@ -569,11 +623,12 @@ export default function CardsView({
                   onChange={(e) => {
                     setIssuerName(e.target.value);
                     setCatalogCardId('');
+                    setCatalogVariantId('');
                   }}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent py-2 text-sm"
                 >
                   <option value="">請選擇銀行</option>
-                  {CREDIT_CARD_ISSUERS.map((issuer) => (
+                  {catalogIssuers.map((issuer) => (
                     <option key={issuer.issuerName} value={issuer.issuerName}>
                       {issuer.bankCode} {issuer.bankName}
                     </option>
@@ -589,7 +644,11 @@ export default function CardsView({
                   required
                   disabled={!issuerName}
                   value={catalogCardId}
-                  onChange={(e) => setCatalogCardId(e.target.value)}
+                  onChange={(e) => {
+                    const nextCard = catalog.find((card) => card.id === e.target.value);
+                    setCatalogCardId(e.target.value);
+                    setCatalogVariantId(nextCard?.variants[0]?.id ?? '');
+                  }}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent py-2 text-sm disabled:opacity-50"
                 >
                   <option value="">{issuerName ? '請選擇信用卡' : '請先選擇銀行'}</option>
@@ -601,12 +660,34 @@ export default function CardsView({
                 </select>
               </div>
 
+              {selectedCatalogCard && selectedCatalogCard.variants.length > 1 && (
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    卡片版本 *
+                  </label>
+                  <select
+                    required
+                    value={selectedCatalogVariant?.id ?? ''}
+                    onChange={(e) => setCatalogVariantId(e.target.value)}
+                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent py-2 text-sm"
+                  >
+                    {selectedCatalogCard.variants.map((variant) => (
+                      <option key={variant.id} value={variant.id}>
+                        {[variant.cardNetworks.join(' / '), variant.cardLevel]
+                          .filter(Boolean)
+                          .join(' · ') || '一般版本'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {selectedCatalogCard && (
                 <div className="grid grid-cols-[96px_1fr] gap-3 rounded-lg bg-white/50 border border-[#75777d]/20 p-3">
                   <div className="flex items-center justify-center">
-                    {selectedCatalogCard.imageUrl ? (
+                    {(selectedCatalogVariant?.imageUrl ?? selectedCatalogCard.imageUrl) ? (
                       <img
-                        src={selectedCatalogCard.imageUrl}
+                        src={selectedCatalogVariant?.imageUrl ?? selectedCatalogCard.imageUrl}
                         alt={selectedCatalogCard.cardName}
                         className="max-w-24 max-h-16 object-contain"
                       />
@@ -616,6 +697,13 @@ export default function CardsView({
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-sm text-primary">{selectedCatalogCard.cardName}</p>
+                    {(selectedCatalogVariant?.cardNetworks.length || selectedCatalogVariant?.cardLevel) && (
+                      <p className="mt-1 text-[10px] font-bold text-on-surface-variant">
+                        {[selectedCatalogVariant.cardNetworks.join(' / '), selectedCatalogVariant.cardLevel]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    )}
                     <p className="text-xs mt-1 text-on-surface">{selectedCatalogCard.rewardDescription}</p>
                     <p className="text-xs mt-1 text-[#846b12]">{selectedCatalogCard.rewardLimitSummary}</p>
                   </div>
@@ -636,6 +724,28 @@ export default function CardsView({
                   onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ''))}
                   className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 py-2 text-sm font-sans"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                  額度 *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="1000"
+                  placeholder="例如 100000"
+                  value={creditLimit}
+                  onChange={(e) => setCreditLimit(e.target.value)}
+                  readOnly={existingBankLimit > 0}
+                  className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 py-2 text-sm font-sans read-only:opacity-60"
+                />
+                <p className="mt-1 text-[10px] text-on-surface-variant">
+                  {existingBankLimit > 0
+                    ? `已沿用 ${selectedCatalogCard?.bankName} 的共用額度。`
+                    : '同一家銀行的信用卡通常共用此額度，只需設定一次。'}
+                </p>
               </div>
 
               <div className="flex justify-end gap-2 pt-4">

@@ -21,7 +21,9 @@ import {
   Heart,
   HeartPulse,
   HandHeart,
-  House
+  House,
+  List,
+  PieChart,
 } from 'lucide-react';
 
 interface ExpensesViewProps {
@@ -81,6 +83,7 @@ export default function ExpensesView({
   const [rewardScenarioId, setRewardScenarioId] = useState('');
   const [category, setCategory] = useState<Transaction['category']>('shopping');
   const [notes, setNotes] = useState('');
+  const [contentView, setContentView] = useState<'list' | 'breakdown'>('list');
 
   // Editing transaction state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -160,6 +163,22 @@ export default function ExpensesView({
 
   // Compute Total Expense for the selected month (we can sum up directly or group by currency)
   const totalExpense = filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+  const categorySpends = filteredTransactions.reduce<Record<Transaction['category'], number>>(
+    (totals, transaction) => {
+      totals[transaction.category] += transaction.amount;
+      return totals;
+    },
+    {
+      shopping: 0,
+      dining: 0,
+      transport: 0,
+      entertainment: 0,
+      medical: 0,
+      social: 0,
+      home: 0,
+      other: 0,
+    },
+  );
 
   const sortedCards = React.useMemo(
     () => [...cards].sort((a, b) => Number(Boolean(b.isFavorite)) - Number(Boolean(a.isFavorite))),
@@ -319,7 +338,7 @@ export default function ExpensesView({
         {/* Total Expense card */}
         <div className="flex-1 bg-surface-container-low p-4 sketch-border pencil-shadow transform -rotate-1 hover:rotate-0 transition-transform relative">
           <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-            當月總消費 (Total Expense)
+            當月總消費
           </p>
           <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1">
             <span className="text-xl font-sans">{currencySymbol}</span>
@@ -332,31 +351,44 @@ export default function ExpensesView({
 
         {/* Total Rewards points card */}
         <div className="flex-1 bg-[var(--accent-bg)] p-4 sketch-border pencil-shadow transform rotate-1 hover:rotate-0 transition-transform relative">
-          <p className="text-xs font-bold text-on-secondary-container uppercase tracking-wider mb-1">
-            累計回饋點數 (Total Rewards)
+          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+            累計回饋點數
           </p>
-          <p className="text-2xl font-bold font-display text-secondary flex items-baseline gap-1.5">
+          <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1.5">
             <span className="text-3xl font-sans">{totalRewardsPoints.toLocaleString()}</span>
             <span className="text-sm font-handwriting">pts / 點</span>
           </p>
           <div className="absolute bottom-2 right-3 opacity-15">
-            <Coins size={40} className="text-secondary" />
+            <Coins size={40} className="text-primary" />
           </div>
         </div>
       </section>
 
       {/* Transaction List Container */}
       <section className="space-y-3 mt-6">
-        <h3 className="text-md font-bold text-on-surface-variant pb-1 border-l-4 border-outline pl-2.5">
-          消費列表
-        </h3>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <h3 className="text-md font-bold text-on-surface-variant border-l-4 border-outline pl-2.5">
+            {contentView === 'list' ? '消費列表' : '支出類別占比'}
+          </h3>
+          <span className="text-center text-xs font-bold text-on-surface-variant">
+            共 <span className="font-sans text-primary">{filteredTransactions.length}</span> 筆
+          </span>
+          <button
+            type="button"
+            onClick={() => setContentView((view) => view === 'list' ? 'breakdown' : 'list')}
+            className="ml-auto flex items-center gap-1 bg-white px-2 py-1 text-xs font-bold text-on-surface-variant sketch-border-sm"
+          >
+            {contentView === 'list' ? <PieChart size={14} /> : <List size={14} />}
+            {contentView === 'list' ? '類別占比' : '消費列表'}
+          </button>
+        </div>
 
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-10 bg-white/30 border border-dashed border-[#75777d]/30 p-6 rounded-md">
             <p className="text-on-surface-variant text-sm font-bold">這個月度目前還沒有建立消費記錄唷！</p>
             <p className="text-outline text-xs mt-1">點選右上角 ＋，新增一筆消費紀錄。</p>
           </div>
-        ) : (
+        ) : contentView === 'list' ? (
           <div className="divide-y-2 divide-dashed divide-[#75777d]/20">
             {filteredTransactions.map((tx) => {
               const pairedCard = cards.find((c) => c.id === tx.cardId);
@@ -442,6 +474,31 @@ export default function ExpensesView({
                     </button>
                   </div>
                 </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-3 bg-[#fcf5c7]/20 p-4 sketch-border pencil-shadow">
+            {Object.entries(categorySpends).map(([categoryKey, total]) => {
+              if (total === 0) return null;
+              const config = categoryConfig[categoryKey as Transaction['category']];
+              const share = (total / totalExpense) * 100;
+
+              return (
+                <div key={categoryKey} className="space-y-1">
+                  <div className="flex justify-between gap-3 text-xs font-bold">
+                    <span>{config.label}</span>
+                    <span className="font-sans">
+                      {currencySymbol} {total.toLocaleString()} ({share.toFixed(0)}%)
+                    </span>
+                  </div>
+                  <div className="h-3 w-full overflow-hidden rounded-md border border-outline bg-white p-0.5">
+                    <div
+                      className={`h-full rounded-sm ${config.bgClass} transition-all duration-500`}
+                      style={{ width: `${share}%` }}
+                    />
+                  </div>
+                </div>
               );
             })}
           </div>
