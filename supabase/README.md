@@ -4,7 +4,7 @@ This directory contains the database schema for the hosted CCRA app.
 
 ## Services
 
-- GitHub Pages hosts the Vite frontend.
+- Vercel hosts the Vite frontend.
 - Supabase Postgres stores profiles, cards, and transactions.
 - Supabase Auth owns application users and sessions.
 - A Supabase Edge Function will complete LINE Login and link the LINE `sub`
@@ -21,7 +21,7 @@ database.
 3. Link this repository to the project.
 4. Run `supabase db push`.
 
-## Required GitHub Actions secrets
+## Public frontend settings
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY` (the publishable key or legacy anon public key)
@@ -31,10 +31,10 @@ database.
 
 - `LINE_CHANNEL_ID` (`2010393614` for the current LINE Login channel)
 - `LINE_CHANNEL_SECRET`
-- `APP_URL` (`https://hao0820.github.io/CCRA/`)
+- `APP_URL` (the production Vercel URL)
 - `ALLOWED_APP_URLS`
 
-Do not add the LINE channel secret or Supabase service-role key to GitHub Pages
+Do not add the LINE channel secret or Supabase service-role key to Vercel
 or any `VITE_` environment variable.
 
 The LINE Login callback URL is:

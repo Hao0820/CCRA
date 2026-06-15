@@ -8,11 +8,8 @@ import { AccentColor, Card, Transaction } from '../types';
 import { ACCENT_COLORS } from '../theme';
 import {
   Banknote,
-  Cloud,
-  LogIn,
   LogOut,
   Palette,
-  UserRound,
   Wallet,
 } from 'lucide-react';
 import { calculateTransactionReward } from '../rewardUtils';
@@ -22,8 +19,6 @@ interface ProfileViewProps {
   transactions: Transaction[];
   budgetLimit: number;
   onUpdateBudget: (limit: number) => void;
-  ledgerName: string;
-  onUpdateLedgerName: (name: string) => void;
   currencySymbol: string;
   cashBalance: number;
   onUpdateCashBalance: (amount: number) => void;
@@ -31,10 +26,7 @@ interface ProfileViewProps {
   onUpdateAccentColor: (color: AccentColor) => void;
   authUserName?: string;
   authPictureUrl?: string;
-  isAuthenticated: boolean;
-  authLoading: boolean;
   authError?: string;
-  onLineLogin: () => void;
   onSignOut: () => void;
 }
 
@@ -43,8 +35,6 @@ export default function ProfileView({
   transactions,
   budgetLimit,
   onUpdateBudget,
-  ledgerName,
-  onUpdateLedgerName,
   currencySymbol,
   cashBalance,
   onUpdateCashBalance,
@@ -52,17 +42,12 @@ export default function ProfileView({
   onUpdateAccentColor,
   authUserName,
   authPictureUrl,
-  isAuthenticated,
-  authLoading,
   authError,
-  onLineLogin,
   onSignOut,
 }: ProfileViewProps) {
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState(String(budgetLimit));
   
-  const [editingName, setEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(ledgerName);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState(String(cashBalance));
 
@@ -123,14 +108,6 @@ export default function ProfileView({
     }
   };
 
-  const handleSaveName = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (nameInput.trim()) {
-      onUpdateLedgerName(nameInput.trim());
-      setEditingName(false);
-    }
-  };
-
   const handleSaveCash = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = Number(cashInput);
@@ -158,7 +135,7 @@ export default function ProfileView({
               />
             ) : (
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#06c755] text-white sketch-border-sm">
-                <Cloud size={21} />
+                <span className="text-lg font-bold">L</span>
               </div>
             )}
             <div className="min-w-0">
@@ -166,25 +143,21 @@ export default function ProfileView({
                 LINE 帳號與雲端同步
               </p>
               <p className="truncate text-sm font-bold text-primary">
-                {isAuthenticated
-                  ? `${authUserName || 'LINE 使用者'}，資料已連結 Supabase`
-                  : '登入後可跨裝置保存信用卡與消費資料'}
+                {authUserName || 'LINE 使用者'}
+              </p>
+              <p className="text-[11px] text-on-surface-variant">
+                已使用 LINE 登入，資料已同步至雲端
               </p>
             </div>
           </div>
 
           <button
             type="button"
-            disabled={authLoading}
-            onClick={isAuthenticated ? onSignOut : onLineLogin}
-            className={`flex shrink-0 items-center gap-1 px-3 py-2 text-xs font-bold sketch-border-sm transition-opacity ${
-              isAuthenticated
-                ? 'bg-white text-[#ba1a1a]'
-                : 'bg-[#06c755] text-white'
-            } disabled:cursor-wait disabled:opacity-50`}
+            onClick={onSignOut}
+            className="flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-xs font-bold text-[#ba1a1a] sketch-border-sm"
           >
-            {isAuthenticated ? <LogOut size={14} /> : <LogIn size={14} />}
-            {authLoading ? '處理中' : isAuthenticated ? '登出' : 'LINE 登入'}
+            <LogOut size={14} />
+            登出
           </button>
         </div>
         {authError && (
@@ -196,43 +169,6 @@ export default function ProfileView({
 
       <section className="bg-white/60 p-4 sketch-border pencil-shadow">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e1e2e5] sketch-border-sm">
-              <UserRound size={20} className="text-[#5f6368]" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-on-surface-variant">用戶名稱</p>
-              {editingName ? (
-                <form onSubmit={handleSaveName} className="mt-1 flex items-center gap-2">
-                  <input
-                    autoFocus
-                    type="text"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    className="min-w-0 flex-1 border-b-2 border-outline bg-transparent py-0.5 text-sm font-bold focus:border-primary focus:outline-none"
-                  />
-                  <button type="submit" className="text-xs font-bold text-[#294e3f]">儲存</button>
-                  <button type="button" onClick={() => setEditingName(false)} className="text-xs text-[#ba1a1a]">取消</button>
-                </form>
-              ) : (
-                <p className="truncate text-lg font-bold text-primary font-display">{ledgerName}</p>
-              )}
-            </div>
-          </div>
-          {!editingName && (
-            <button
-              onClick={() => {
-                setNameInput(ledgerName);
-                setEditingName(true);
-              }}
-              className="shrink-0 text-xs font-bold text-secondary underline"
-            >
-              編輯
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-dashed border-[#75777d]/30 pt-4">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fcf5c7] sketch-border-sm">
               <Banknote size={20} className="text-[#846b12]" />

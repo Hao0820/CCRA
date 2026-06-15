@@ -21,7 +21,7 @@ CCRA 是一套台灣信用卡回饋與消費管理工具，可記錄信用卡、
 | 前端 | React 19、TypeScript、Vite |
 | 樣式 | Tailwind CSS |
 | 圖示 | Lucide React |
-| 前端部署 | GitHub Pages |
+| 前端部署 | Vercel |
 | 後端 | Supabase |
 | 資料庫 | Supabase PostgreSQL |
 | 使用者登入 | LINE Login，透過 Supabase Edge Function 串接 |
@@ -35,10 +35,8 @@ src/data/taiwan_credit_cards_2026-06-15.json
 ## 目前狀態
 
 目前前端功能可直接使用，使用者資料暫時儲存在瀏覽器
-`localStorage`。已建立 GitHub Pages 部署流程以及 Supabase
-資料庫 schema，但 LINE Login、Supabase API 和既有資料搬移仍待正式串接。
-
-尚未設定 Supabase 時，應用程式仍可在本機正常使用。
+使用者必須以 LINE 登入才能進入主畫面。信用卡、消費、現金、預算與介面
+設定皆儲存在 Supabase，不再載入瀏覽器內的範例資料。
 
 ## 本機開發
 
@@ -96,48 +94,28 @@ VITE_LINE_LOGIN_URL="https://YOUR_PROJECT.supabase.co/functions/v1/line-login"
 - Supabase service-role key
 - 任何私人 API Key
 
-## 部署到 GitHub Pages
+## 部署到 Vercel
 
-專案已包含：
+專案已連結至 Vercel 的 `ccra` project，正式網址：
 
 ```text
-.github/workflows/deploy-pages.yml
+https://ccra-sooty.vercel.app/
 ```
 
-### 1. 建立 GitHub Repository
-
-在 GitHub 建立新的 repository，接著於專案目錄執行：
+手動部署 production：
 
 ```powershell
-git add .
-git commit -m "Initial CCRA release"
-git remote add origin https://github.com/YOUR_GITHUB_NAME/YOUR_REPOSITORY.git
-git push -u origin main
+npx vercel --prod
 ```
 
-請將網址中的帳號與 repository 名稱換成自己的資料。
+也可以在 Vercel Dashboard 將 GitHub repository
+`Hao0820/CCRA` 連結至該 project，之後推送 `main` 即會自動部署。
 
-### 2. 啟用 GitHub Pages
-
-進入 repository：
-
-```text
-Settings > Pages > Build and deployment
-```
-
-將 `Source` 設定為 `GitHub Actions`。
-
-### 3. Supabase 公開設定
-
-目前 GitHub Actions workflow 已設定 CCRA 使用的 Supabase Project URL、
-Publishable key 與 LINE Login Function URL。這些值會包含在前端程式碼中，
-屬於可公開設定；資料存取安全性由 Supabase Auth 與 Row Level Security
-負責。
+Vercel 設定位於 `vercel.json`，包含 Vite build、SPA rewrite 與可公開的
+Supabase URL、Publishable key、LINE Login Function URL。
 
 `sb_secret_...`、service-role key 與 LINE Channel Secret 絕對不可放進
-GitHub Actions workflow 或任何 `VITE_` 變數。
-
-每次推送到 `main` 分支後，GitHub Actions 會自動檢查、建置並部署網站。
+Vercel 前端環境或任何 `VITE_` 變數。
 
 ## 建立 Supabase 後端
 
@@ -188,8 +166,8 @@ Supabase Edge Function Secrets 預計包含：
 ```text
 LINE_CHANNEL_ID=2010393614
 LINE_CHANNEL_SECRET
-APP_URL=https://hao0820.github.io/CCRA/
-ALLOWED_APP_URLS=https://hao0820.github.io/CCRA/,http://localhost:3000/
+APP_URL=https://ccra-sooty.vercel.app/
+ALLOWED_APP_URLS=https://ccra-sooty.vercel.app/,http://localhost:3000/
 ```
 
 新版 Supabase Dashboard 可在以下位置取得前端金鑰：
@@ -203,7 +181,7 @@ Project Settings > API Keys > Publishable and secret API keys
 填入本專案的 `VITE_SUPABASE_ANON_KEY`。
 
 LINE Developers Console 的 Callback URL 必須設定為實際的 Edge Function
-callback URL，而 GitHub Pages 網址則用於登入完成後返回前端。
+callback URL，而 Vercel 網址則用於登入完成後返回前端。
 
 目前 CCRA 使用的 Callback URL：
 
@@ -242,15 +220,15 @@ https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login/health
 | `my_ledger_cards` | `user_cards` |
 | `my_ledger_txs` | `transactions` |
 
-目前實作會在該 LINE 帳號尚無雲端信用卡與消費資料時，自動上傳瀏覽器
-現有資料；若雲端已有資料，則以雲端內容載入目前裝置。登入後的修改會自動
-同步名稱、預算、現金、輔色、信用卡及消費紀錄。
+未登入時只會顯示 LINE 登入頁，不會載入主畫面。登入後以 Supabase
+資料為準；新帳號會從空白信用卡與空白消費紀錄開始。後續修改會自動同步
+預算、現金、輔色、信用卡及消費紀錄。
 
 ## 專案結構
 
 ```text
 ccra/
-├─ .github/workflows/       GitHub Pages 部署流程
+├─ vercel.json              Vercel 部署與 SPA 設定
 ├─ src/
 │  ├─ components/          頁面與彈窗元件
 │  ├─ data/                信用卡 JSON 資料

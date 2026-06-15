@@ -6,11 +6,11 @@
 import React, { useState, useEffect } from 'react';
 import { AccentColor, Card, Transaction } from './types';
 import { ACCENT_COLORS } from './theme';
-import { INITIAL_CARDS, INITIAL_TRANSACTIONS } from './initialData';
 import { Edit3, Plus, CreditCard, User } from 'lucide-react';
 import CardsView from './components/CardsView';
 import ExpensesView from './components/ExpensesView';
 import ProfileView from './components/ProfileView';
+import LoginView from './components/LoginView';
 import { CREDIT_CARD_CATALOG } from './creditCardCatalog';
 import { isSupabaseConfigured, supabase } from './supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -40,7 +40,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'expense' | 'cards' | 'profile'>('cards');
 
   // Ledger configuration
-  const [ledgerName, setLedgerName] = useState('My Ledger');
   const [budgetLimit, setBudgetLimit] = useState(150000);
   const [cashBalance, setCashBalance] = useState(0);
   const [accentColor, setAccentColor] = useState<AccentColor>('pink');
@@ -59,6 +58,21 @@ export default function App() {
     const now = new Date();
     return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
+  const lineDisplayName =
+    authUser?.user_metadata?.display_name ??
+    authUser?.user_metadata?.name ??
+    'LINE 使用者';
+
+  useEffect(() => {
+    [
+      'my_ledger_cards',
+      'my_ledger_txs',
+      'my_ledger_name',
+      'my_ledger_budget',
+      'ccra_cash_balance',
+      'ccra_accent_color',
+    ].forEach((key) => localStorage.removeItem(key));
+  }, []);
 
   useEffect(() => {
     if (!supabase) {
@@ -157,33 +171,17 @@ export default function App() {
       const cloudTransactions = (transactionsResult.data ?? [])
         .map((row) => row.transaction_data as Transaction)
         .filter((transaction) => transaction?.id);
-      const hasCloudLedger =
-        cloudCards.length > 0 || cloudTransactions.length > 0;
-
-      if (!cancelled && hasCloudLedger) {
+      if (!cancelled) {
         setCards(cloudCards);
         setTransactions(cloudTransactions);
-        localStorage.setItem('my_ledger_cards', JSON.stringify(cloudCards));
-        localStorage.setItem(
-          'my_ledger_txs',
-          JSON.stringify(cloudTransactions),
-        );
 
         const profile = profileResult.data;
-        const cloudName = profile.display_name || 'My Ledger';
         const cloudBudget = Number(profile.monthly_budget);
         const cloudCash = Number(profile.cash_balance);
         const cloudAccent = profile.accent_color as AccentColor;
-        setLedgerName(cloudName);
         setBudgetLimit(cloudBudget);
         setCashBalance(cloudCash);
         if (ACCENT_COLORS[cloudAccent]) setAccentColor(cloudAccent);
-        localStorage.setItem('my_ledger_name', cloudName);
-        localStorage.setItem('my_ledger_budget', String(cloudBudget));
-        localStorage.setItem('ccra_cash_balance', String(cloudCash));
-        if (ACCENT_COLORS[cloudAccent]) {
-          localStorage.setItem('ccra_accent_color', cloudAccent);
-        }
       }
 
       if (!cancelled) {
@@ -205,7 +203,7 @@ export default function App() {
       const syncCloudData = async () => {
         const { error: profileError } = await supabase.from('profiles').upsert({
           id: authUser.id,
-          display_name: ledgerName,
+          display_name: lineDisplayName,
           monthly_budget: budgetLimit,
           cash_balance: cashBalance,
           accent_color: accentColor,
@@ -321,59 +319,17 @@ export default function App() {
     cards,
     cashBalance,
     cloudReadyUserId,
-    ledgerName,
+    lineDisplayName,
     transactions,
   ]);
-
-  // Load from LocalStorage or pre-fill
-  useEffect(() => {
-    const cachedCards = localStorage.getItem('my_ledger_cards');
-    const cachedTransactions = localStorage.getItem('my_ledger_txs');
-    const cachedName = localStorage.getItem('my_ledger_name');
-    const cachedBudget = localStorage.getItem('my_ledger_budget');
-    const cachedCash = localStorage.getItem('ccra_cash_balance');
-    const cachedAccent = localStorage.getItem('ccra_accent_color') as AccentColor | null;
-
-    if (cachedCards) {
-      const hydratedCards = (JSON.parse(cachedCards) as Card[]).map(hydrateCardRewards);
-      setCards(hydratedCards);
-      localStorage.setItem('my_ledger_cards', JSON.stringify(hydratedCards));
-    } else {
-      setCards(INITIAL_CARDS);
-      localStorage.setItem('my_ledger_cards', JSON.stringify(INITIAL_CARDS));
-    }
-
-    if (cachedTransactions) {
-      setTransactions(JSON.parse(cachedTransactions));
-    } else {
-      setTransactions(INITIAL_TRANSACTIONS);
-      localStorage.setItem('my_ledger_txs', JSON.stringify(INITIAL_TRANSACTIONS));
-    }
-
-    if (cachedName) {
-      setLedgerName(cachedName);
-    }
-
-    if (cachedBudget) {
-      setBudgetLimit(Number(cachedBudget));
-    }
-    if (cachedCash) {
-      setCashBalance(Number(cachedCash));
-    }
-    if (cachedAccent && ACCENT_COLORS[cachedAccent]) {
-      setAccentColor(cachedAccent);
-    }
-  }, []);
 
   // Sync utilities
   const saveCards = (newCards: Card[]) => {
     setCards(newCards);
-    localStorage.setItem('my_ledger_cards', JSON.stringify(newCards));
   };
 
   const saveTransactions = (newTxs: Transaction[]) => {
     setTransactions(newTxs);
-    localStorage.setItem('my_ledger_txs', JSON.stringify(newTxs));
   };
 
   // Add Card action
@@ -400,7 +356,6 @@ export default function App() {
     if (newTx.cardId === 'cash') {
       const nextCash = cashBalance - newTx.amount;
       setCashBalance(nextCash);
-      localStorage.setItem('ccra_cash_balance', String(nextCash));
     }
     saveTransactions([...transactions, newTx]);
   };
@@ -413,7 +368,6 @@ export default function App() {
     if (updatedTx.cardId === 'cash') nextCash -= updatedTx.amount;
     if (nextCash !== cashBalance) {
       setCashBalance(nextCash);
-      localStorage.setItem('ccra_cash_balance', String(nextCash));
     }
     saveTransactions(transactions.map((tx) => tx.id === updatedTx.id ? updatedTx : tx));
   };
@@ -424,7 +378,6 @@ export default function App() {
     if (transaction?.cardId === 'cash') {
       const nextCash = cashBalance + transaction.amount;
       setCashBalance(nextCash);
-      localStorage.setItem('ccra_cash_balance', String(nextCash));
     }
     saveTransactions(transactions.filter((tx) => tx.id !== txId));
   };
@@ -459,6 +412,32 @@ export default function App() {
   };
 
   const accent = ACCENT_COLORS[accentColor];
+  const handleLineLogin = () => {
+    const loginUrl = import.meta.env.VITE_LINE_LOGIN_URL;
+    if (!loginUrl) {
+      setAuthError('尚未設定 LINE Login URL');
+      return;
+    }
+    setAuthError('');
+    const returnTo = `${window.location.origin}${window.location.pathname}`;
+    window.location.assign(
+      `${loginUrl}?return_to=${encodeURIComponent(returnTo)}`,
+    );
+  };
+
+  if (!authUser) {
+    return (
+      <LoginView
+        loading={authLoading}
+        error={authError}
+        onLineLogin={handleLineLogin}
+      />
+    );
+  }
+
+  if (cloudReadyUserId !== authUser.id) {
+    return <LoginView loading error={authError} onLineLogin={handleLineLogin} />;
+  }
 
   return (
     <div
@@ -542,48 +521,26 @@ export default function App() {
             budgetLimit={budgetLimit}
             onUpdateBudget={(num) => {
               setBudgetLimit(num);
-              localStorage.setItem('my_ledger_budget', String(num));
-            }}
-            ledgerName={ledgerName}
-            onUpdateLedgerName={(name) => {
-              setLedgerName(name);
-              localStorage.setItem('my_ledger_name', name);
             }}
             currencySymbol={getDisplayCurrencySymbol()}
             cashBalance={cashBalance}
             onUpdateCashBalance={(amount) => {
               setCashBalance(amount);
-              localStorage.setItem('ccra_cash_balance', String(amount));
             }}
             accentColor={accentColor}
             onUpdateAccentColor={(color) => {
               setAccentColor(color);
-              localStorage.setItem('ccra_accent_color', color);
             }}
-            authUserName={
-              authUser?.user_metadata?.display_name ??
-              authUser?.user_metadata?.name
-            }
+            authUserName={lineDisplayName}
             authPictureUrl={authUser?.user_metadata?.picture_url}
-            isAuthenticated={Boolean(authUser)}
-            authLoading={authLoading}
             authError={authError}
-            onLineLogin={() => {
-              const loginUrl = import.meta.env.VITE_LINE_LOGIN_URL;
-              if (!loginUrl) {
-                setAuthError('尚未設定 LINE Login URL');
-                return;
-              }
-              setAuthError('');
-              const returnTo = `${window.location.origin}${window.location.pathname}`;
-              window.location.assign(
-                `${loginUrl}?return_to=${encodeURIComponent(returnTo)}`,
-              );
-            }}
             onSignOut={() => {
               if (!supabase) return;
               setAuthLoading(true);
               void supabase.auth.signOut().then(({ error }) => {
+                setCards([]);
+                setTransactions([]);
+                setCloudReadyUserId(null);
                 setAuthError(error?.message ?? '');
                 setAuthLoading(false);
               });

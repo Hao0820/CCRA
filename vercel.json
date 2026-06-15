@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run check",
+  "outputDirectory": "dist",
+  "env": {
+    "VITE_SUPABASE_URL": "https://gssfqmiynesmtvbmeklb.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "sb_publishable_Z69YN1bMWNr9kI3Aqib6eA_L0lSySxZ",
+    "VITE_APP_URL": "https://ccra-sooty.vercel.app",
+    "VITE_LINE_LOGIN_URL": "https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

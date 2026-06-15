@@ -9,3 +9,6 @@ work/
 !.env.example
 .supabase/
 supabase/.temp/
+.vercel/
+
+.vercel
