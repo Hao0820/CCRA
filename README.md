@@ -127,21 +127,15 @@ Settings > Pages > Build and deployment
 
 將 `Source` 設定為 `GitHub Actions`。
 
-### 3. 設定 GitHub Actions Secrets
+### 3. Supabase 公開設定
 
-進入：
+目前 GitHub Actions workflow 已設定 CCRA 使用的 Supabase Project URL、
+Publishable key 與 LINE Login Function URL。這些值會包含在前端程式碼中，
+屬於可公開設定；資料存取安全性由 Supabase Auth 與 Row Level Security
+負責。
 
-```text
-Settings > Secrets and variables > Actions
-```
-
-新增：
-
-| Secret | 說明 |
-| --- | --- |
-| `VITE_SUPABASE_URL` | Supabase Project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase Publishable key；舊專案也可使用 `anon public` |
-| `VITE_LINE_LOGIN_URL` | LINE Login Edge Function URL |
+`sb_secret_...`、service-role key 與 LINE Channel Secret 絕對不可放進
+GitHub Actions workflow 或任何 `VITE_` 變數。
 
 每次推送到 `main` 分支後，GitHub Actions 會自動檢查、建置並部署網站。
 

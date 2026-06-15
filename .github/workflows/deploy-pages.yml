@@ -41,9 +41,9 @@ jobs:
         run: npm run build -- --base "${{ steps.pages.outputs.base_path }}/"
         env:
           VITE_APP_URL: ${{ steps.pages.outputs.origin }}${{ steps.pages.outputs.base_path }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_LINE_LOGIN_URL: ${{ secrets.VITE_LINE_LOGIN_URL }}
+          VITE_SUPABASE_URL: https://gssfqmiynesmtvbmeklb.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_Z69YN1bMWNr9kI3Aqib6eA_L0lSySxZ
+          VITE_LINE_LOGIN_URL: https://gssfqmiynesmtvbmeklb.supabase.co/functions/v1/line-login
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
