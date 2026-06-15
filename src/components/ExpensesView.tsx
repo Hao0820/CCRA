@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Card, Transaction } from '../types';
+import { Card, Transaction, RewardScenario } from '../types';
 import { calculateTransactionReward, getTransactionRewardRate } from '../rewardUtils';
 import { 
   Plus, 
