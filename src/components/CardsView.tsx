@@ -488,7 +488,6 @@ export default function CardsView({
         >
           <div
             className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[#fdf9e9] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
-            onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-dashed border-outline pb-3">
               <p className="text-xs font-bold text-on-surface-variant">消費方式</p>
