@@ -96,8 +96,10 @@ export default function CardsView({
 
   // Calculate rewards for a card
   const getCardRewards = (card: Card) => {
+    const now = new Date();
+    const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     return transactions
-      .filter((tx) => tx.cardId === card.id)
+      .filter((tx) => tx.cardId === card.id && tx.date.startsWith(monthPrefix))
       .reduce((sum, tx) => sum + calculateTransactionReward(tx, card), 0);
   };
 
@@ -306,15 +308,15 @@ export default function CardsView({
       {/* Card Details Popup Modal */}
       {selectedCard && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
           onClick={() => setSelectedCard(null)}
         >
           <div
-            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md max-h-[82vh] overflow-y-auto p-5 transform scale-100 transition-all duration-300 relative rotate-1"
+            className="bg-[#fdf9e9] sketch-border sketch-shadow w-full max-w-md max-h-[calc(100dvh-7rem)] overflow-y-auto p-4 transform scale-100 transition-all duration-300 relative rotate-1"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between gap-2 border-b border-outline border-dashed pb-2">
-              <h3 className="font-display text-xl font-bold text-primary">
+            <div className="mb-3 flex items-center justify-between gap-2 border-b border-outline border-dashed pb-2">
+              <h3 className="font-display text-lg font-bold text-primary">
                 卡片詳細資訊
               </h3>
               <button
@@ -340,7 +342,7 @@ export default function CardsView({
               </button>
             </div>
 
-            <div className="space-y-4 text-left">
+            <div className="space-y-3 text-left">
               <div>
                 <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
                   發卡銀行與名稱
@@ -389,38 +391,46 @@ export default function CardsView({
                 </div>
               )}
 
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  末四碼
-                </p>
-                <p className="text-sm font-sans font-bold text-on-surface">
-                  •••• •••• •••• {selectedCard.lastFour || 'XXXX'}
-                </p>
-                {(selectedCard.cardNetworks?.length || selectedCard.cardLevel) && (
-                  <p className="mt-1 text-xs text-on-surface-variant">
-                    {[selectedCard.cardNetworks?.join(' / '), selectedCard.cardLevel]
-                      .filter(Boolean)
-                      .join(' · ')}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="mb-1 text-xs font-bold text-on-surface-variant">末四碼</p>
+                  <p className="text-sm font-sans font-bold text-on-surface">
+                    •••• {selectedCard.lastFour || 'XXXX'}
                   </p>
-                )}
+                  {(selectedCard.cardNetworks?.length || selectedCard.cardLevel) && (
+                    <p className="mt-1 text-[10px] text-on-surface-variant">
+                      {[selectedCard.cardNetworks?.join(' / '), selectedCard.cardLevel]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <p className="mb-1 text-xs font-bold text-on-surface-variant">額度</p>
+                  <p className="text-sm font-sans font-bold text-on-surface">
+                    {selectedCard.currency} {(selectedCard.creditLimit ?? 0).toLocaleString()}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  額度
-                </p>
-                <p className="text-sm font-sans font-bold text-on-surface">
-                  {selectedCard.currency} {(selectedCard.creditLimit ?? 0).toLocaleString()}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  本月累積消費金額 (Current Spend)
-                </p>
-                <p className="text-lg text-primary font-bold sketch-border-sm px-3 py-1.5 inline-block bg-[#f8f4e4] shadow-sm font-sans">
-                  {selectedCard.currency} {getCardSpend(selectedCard.id).toLocaleString()}
-                </p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-md border border-[#75777d]/20 bg-[#f8f4e4] p-2">
+                  <p className="mb-1 text-[10px] font-bold text-on-surface-variant">
+                    本月累積消費金額
+                  </p>
+                  <p className="text-base font-bold font-sans text-primary">
+                    {selectedCard.currency} {getCurrentMonthSpend(selectedCard.id).toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-md border border-[#75777d]/20 bg-[var(--accent-bg)]/40 p-2">
+                  <p className="mb-1 text-[10px] font-bold text-on-surface-variant">
+                    本月累積回饋數
+                  </p>
+                  <p className="flex items-center gap-1 text-base font-bold font-sans text-secondary">
+                    <Coins size={14} />
+                    {getCardRewards(selectedCard).toLocaleString()} 點
+                  </p>
+                </div>
               </div>
 
               {(!selectedCard.rewardScenarios || selectedCard.rewardScenarios.length === 0) && (
@@ -448,21 +458,9 @@ export default function CardsView({
                 </div>
               )}
 
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  本月累計回饋數 (Estimated Rewards)
-                </p>
-                <p className="text-md font-bold text-secondary flex items-center gap-1.5">
-                  <Coins size={18} className="text-[#765469]" />
-                  <span className="text-lg font-sans underline decoration-dashed decoration-secondary">
-                    {getCardRewards(selectedCard).toLocaleString()}
-                  </span>{' '}
-                  pts / 點
-                </p>
-              </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-[1fr_auto] items-center gap-2 pt-2 border-t border-dashed border-[#75777d]/30">
+            <div className="mt-4 grid grid-cols-[1fr_auto] items-center gap-2 pt-2 border-t border-dashed border-[#75777d]/30">
               <button
                 type="button"
                 className="flex items-center justify-center gap-1.5 px-4 py-1.5 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 active:scale-95 transition-all text-xs font-bold pencil-shadow"

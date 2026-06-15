@@ -29,6 +29,7 @@
 }
 
 body {
+  min-height: 100dvh;
   background-color: #fdf9e9;
   color: #1c1c13;
   font-family: "Karla", sans-serif;
@@ -37,6 +38,10 @@ body {
     linear-gradient(rgba(117,119,125,0.06) 1px, transparent 1px);
   background-size: 20px 24px;
   background-position: center top;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Custom classes for handwritten/pencil vibe */
