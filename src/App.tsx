@@ -12,7 +12,11 @@ import ExpensesView from './components/ExpensesView';
 import ProfileView from './components/ProfileView';
 import LoginView from './components/LoginView';
 import { CREDIT_CARD_CATALOG } from './creditCardCatalog';
-import { isSupabaseConfigured, supabase } from './supabase';
+import {
+  isSupabaseConfigured,
+  LINE_LOGIN_URL,
+  supabase,
+} from './supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 function hydrateCardRewards(card: Card): Card {
@@ -413,15 +417,10 @@ export default function App() {
 
   const accent = ACCENT_COLORS[accentColor];
   const handleLineLogin = () => {
-    const loginUrl = import.meta.env.VITE_LINE_LOGIN_URL;
-    if (!loginUrl) {
-      setAuthError('尚未設定 LINE Login URL');
-      return;
-    }
     setAuthError('');
     const returnTo = `${window.location.origin}${window.location.pathname}`;
     window.location.assign(
-      `${loginUrl}?return_to=${encodeURIComponent(returnTo)}`,
+      `${LINE_LOGIN_URL}?return_to=${encodeURIComponent(returnTo)}`,
     );
   };
 

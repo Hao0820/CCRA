@@ -1,14 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
+export const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL?.trim() ||
+  'https://gssfqmiynesmtvbmeklb.supabase.co';
+
+const supabasePublishableKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ||
+  'sb_publishable_Z69YN1bMWNr9kI3Aqib6eA_L0lSySxZ';
+
+export const LINE_LOGIN_URL =
+  import.meta.env.VITE_LINE_LOGIN_URL?.trim() ||
+  `${SUPABASE_URL}/functions/v1/line-login`;
 
 export const isSupabaseConfigured = Boolean(
-  supabaseUrl && supabasePublishableKey,
+  SUPABASE_URL && supabasePublishableKey,
 );
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabasePublishableKey, {
+  ? createClient(SUPABASE_URL, supabasePublishableKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
