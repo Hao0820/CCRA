@@ -1,4 +1,4 @@
-import { Cloud, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 interface LoginViewProps {
   loading: boolean;
@@ -15,9 +15,11 @@ export default function LoginView({
     <main className="min-h-screen px-5 py-8 font-handwriting">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md items-center justify-center">
         <section className="w-full space-y-6 bg-[#fdf9e9]/95 p-7 text-center sketch-border sketch-shadow">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#06c755] text-white sketch-border-sm">
-            <Cloud size={32} />
-          </div>
+          <img
+            src="/branding/ccra-icon-192.png"
+            alt="CCRA"
+            className="mx-auto h-20 w-20 rounded-2xl object-cover sketch-border-sm"
+          />
 
           <div className="space-y-2">
             <p className="font-display text-3xl font-bold tracking-wider text-primary">
