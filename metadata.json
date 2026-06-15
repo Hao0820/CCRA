@@ -1,0 +1,6 @@
+{
+  "name": "My Ledger",
+  "description": "A cozy, hand-drawn digital pocket ledger to record your transactions and track credit card points and spending.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=Bricolage+Grotesque:wght@600;700&family=Yomogi&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Karla", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-handwriting: "Yomogi", cursive, sans-serif;
+  
+  --color-surface-bg: #fdf9e9;
+  --color-surface-dim: #dedacb;
+  --color-surface-bright: #fdf9e9;
+  --color-surface-container-low: #f8f4e4;
+  --color-surface-container: #f2eede;
+  --color-surface-container-high: #ece8d9;
+  --color-surface-container-highest: #e6e3d3;
+  --color-on-surface: #1c1c13;
+  --color-on-surface-variant: #44474c;
+  --color-outline: #75777d;
+  --color-primary: #212b3a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #374151;
+  --color-secondary: #765469;
+  --color-secondary-container: #fdd0ea;
+  --color-on-secondary-container: #79576c;
+  --color-tertiary: #0a3123;
+  --color-tertiary-container: #234738;
+  --color-tertiary-fixed: #c3ecd7;
+  --color-primary-fixed: #d9e3f7;
+}
+
+body {
+  background-color: #fdf9e9;
+  color: #1c1c13;
+  font-family: "Karla", sans-serif;
+  background-image: 
+    linear-gradient(90deg, rgba(117,119,125,0.04) 1px, transparent 1px),
+    linear-gradient(rgba(117,119,125,0.06) 1px, transparent 1px);
+  background-size: 20px 24px;
+  background-position: center top;
+}
+
+/* Custom classes for handwritten/pencil vibe */
+.font-handwriting {
+  font-family: "Yomogi", cursive, sans-serif;
+}
+
+.font-display {
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+
+/* Sketchy Borders */
+.sketch-border {
+  border: 2px solid #75777d;
+  border-radius: 8px 255px 12px 25px / 255px 10px 225px 8px;
+}
+
+.sketch-border-sm {
+  border: 1px solid #75777d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+
+.sketchy-border-bottom {
+  border-bottom: 2px dashed #75777d;
+  border-radius: 0 0 100px 50px/0 0 10px 5px;
+}
+
+/* Graphite Shading */
+.sketch-shadow {
+  box-shadow: 3px 4px 6px -1px rgba(117, 119, 125, 0.3), 1px 2px 4px -1px rgba(117, 119, 125, 0.2);
+}
+
+.pencil-shadow {
+  box-shadow: 2px 3px 0px 0px rgba(117,119,125,0.3);
+}
+
+/* Irregular Lines */
+.hand-line {
+  width: 90%;
+  height: 2px;
+  background-color: #75777d;
+  margin: 0 auto;
+  opacity: 0.3;
+  transform: rotate(-0.5deg);
+}
+
+/* Scrollbar logic */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
