@@ -696,52 +696,83 @@ export default function ExpensesView({
                     );
                     const hasRealConditions = realConditions.length > 0;
 
+                    // Build a list of displayable rows combining components with conditions
+                    const components = selectedScenario.components ?? [];
+                    // Use components if available (they have per-level rates); otherwise use conditions with full rate
+                    const rows: { key: string; label: string; rate: number; unlimited?: boolean }[] =
+                      components.length > 0
+                        ? components.map((comp, i) => ({
+                            key: `${selectedScenario.id}-comp-${i}`,
+                            label: comp.description,
+                            rate: comp.rate,
+                            unlimited: comp.unlimited,
+                          }))
+                        : realConditions.map((cond) => ({
+                            key: `${selectedScenario.id}-${cond}`,
+                            label: cond,
+                            rate: selectedScenario.rate,
+                          }));
+
+                    const hasRows = rows.length > 0;
+
+                    // Calculate current total rate from checked rows
+                    const checkedKeys = card?.achievedConditions ?? [];
+                    const currentRate = hasRows
+                      ? rows.reduce((sum, row) => (checkedKeys.includes(row.key) ? sum + row.rate : sum), 0)
+                      : selectedScenario.rate;
+
                     return (
                       <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
-                        {selectedScenario.description && (
-                          <div>
-                            <span className="font-bold text-on-surface">規則：</span>
-                            {selectedScenario.rule}
-                          </div>
-                        )}
                         {selectedScenario.limit && (
                           <div className="text-[#846b12]">
                             <span className="font-bold">上限：</span>
                             {selectedScenario.limit}
                           </div>
                         )}
-                        {hasRealConditions && card && onUpdateCard && (
-                          <div className="bg-[var(--color-surface-container-low)] p-2 rounded-sm space-y-1.5 mt-2 border border-[#75777d]/20">
-                            <p className="font-bold text-on-surface text-xs">需達成條件：</p>
-                            {realConditions.map((cond, idx) => {
-                               const condKey = `${selectedScenario.id}-${cond}`;
-                               const isChecked = card.achievedConditions?.includes(condKey);
-                               return (
-                                 <label key={idx} className="flex items-start gap-1.5 cursor-pointer group">
-                                   <input 
-                                     type="checkbox" 
-                                     className="mt-0.5 w-3.5 h-3.5 rounded-sm border-outline accent-primary shrink-0" 
-                                     checked={isChecked} 
-                                     onChange={() => {
-                                       const current = card.achievedConditions || [];
-                                       const newConditions = current.includes(condKey)
-                                         ? current.filter(c => c !== condKey)
-                                         : [...current, condKey];
-                                       onUpdateCard({ ...card, achievedConditions: newConditions });
-                                     }} 
-                                   />
-                                   <span className="text-on-surface group-hover:text-primary transition-colors flex-1">{cond}</span>
-                                 </label>
-                               );
+                        {hasRows && card && onUpdateCard && (
+                          <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
+                            <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
+                              {components.length > 0 ? '勾選達成的回饋加成：' : '需達成條件：'}
+                            </p>
+                            {rows.map((row, idx) => {
+                              const isChecked = checkedKeys.includes(row.key);
+                              return (
+                                <label
+                                  key={row.key}
+                                  className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
+                                    idx < rows.length - 1 ? 'border-b border-[#75777d]/10' : ''
+                                  } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    className="w-4 h-4 rounded-sm border-outline accent-primary shrink-0"
+                                    checked={isChecked}
+                                    onChange={() => {
+                                      const current = card.achievedConditions || [];
+                                      const newConditions = current.includes(row.key)
+                                        ? current.filter(c => c !== row.key)
+                                        : [...current, row.key];
+                                      onUpdateCard({ ...card, achievedConditions: newConditions });
+                                    }}
+                                  />
+                                  <span className={`flex-1 text-xs leading-snug ${isChecked ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                    {row.label}
+                                  </span>
+                                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold font-sans border ${
+                                    isChecked
+                                      ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-black/10'
+                                      : 'bg-white/60 text-on-surface-variant border-[#75777d]/20'
+                                  }`}>
+                                    +{row.rate}%
+                                  </span>
+                                </label>
+                              );
                             })}
                           </div>
                         )}
-                        <div className="mt-3 p-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm font-bold text-center border border-black/10 text-xs shadow-sm">
-                          {(() => {
-                            const allConditionsMet = !hasRealConditions || realConditions.every(cond => card?.achievedConditions?.includes(`${selectedScenario.id}-${cond}`));
-                            const currentRate = allConditionsMet ? selectedScenario.rate : (card?.rewardRate ?? 0);
-                            return `目前預估回饋：${currentRate}%${allConditionsMet ? '' : ' (未滿足條件)'}`;
-                          })()}
+                        <div className="flex items-center justify-between mt-2 px-2.5 py-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm border border-black/10 shadow-sm">
+                          <span className="text-xs font-bold">預估回饋</span>
+                          <span className="text-base font-bold font-sans">{currentRate}%</span>
                         </div>
                       </div>
                     );
