@@ -698,28 +698,45 @@ export default function ExpensesView({
 
                     // Build a list of displayable rows combining components with conditions
                     const components = selectedScenario.components ?? [];
-                    // Use components if available (they have per-level rates); otherwise use conditions with full rate
-                    const rows: { key: string; label: string; rate: number; unlimited?: boolean }[] =
-                      components.length > 0
-                        ? components.map((comp, i) => ({
+
+                    type Row = { key: string; label: string; rate: number };
+
+                    // Split components into base (always counted) vs conditional (need checkbox)
+                    // A component is "base" if it's unlimited OR it's the last one with no meaningful condition marker
+                    const isBaseComponent = (comp: typeof components[0], idx: number) =>
+                      comp.unlimited === true || idx === components.length - 1;
+
+                    let baseRate = 0;
+                    let conditionalRows: Row[] = [];
+
+                    if (components.length > 0) {
+                      components.forEach((comp, i) => {
+                        if (isBaseComponent(comp, i)) {
+                          baseRate += comp.rate;
+                        } else {
+                          conditionalRows.push({
                             key: `${selectedScenario.id}-comp-${i}`,
                             label: comp.description,
                             rate: comp.rate,
-                            unlimited: comp.unlimited,
-                          }))
-                        : realConditions.map((cond) => ({
-                            key: `${selectedScenario.id}-${cond}`,
-                            label: cond,
-                            rate: selectedScenario.rate,
-                          }));
+                          });
+                        }
+                      });
+                    } else {
+                      // Condition-based (no components): treat entire scenario rate as conditional
+                      conditionalRows = realConditions.map((cond) => ({
+                        key: `${selectedScenario.id}-${cond}`,
+                        label: cond,
+                        rate: selectedScenario.rate,
+                      }));
+                    }
 
-                    const hasRows = rows.length > 0;
-
-                    // Calculate current total rate from checked rows
+                    const hasConditionalRows = conditionalRows.length > 0;
                     const checkedKeys = card?.achievedConditions ?? [];
-                    const currentRate = hasRows
-                      ? rows.reduce((sum, row) => (checkedKeys.includes(row.key) ? sum + row.rate : sum), 0)
-                      : selectedScenario.rate;
+                    const checkedRate = conditionalRows.reduce(
+                      (sum, row) => (checkedKeys.includes(row.key) ? sum + row.rate : sum),
+                      0
+                    );
+                    const currentRate = baseRate + checkedRate;
 
                     return (
                       <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
@@ -729,18 +746,18 @@ export default function ExpensesView({
                             {selectedScenario.limit}
                           </div>
                         )}
-                        {hasRows && card && onUpdateCard && (
+                        {hasConditionalRows && card && onUpdateCard && (
                           <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
                             <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
-                              {components.length > 0 ? '勾選達成的回饋加成：' : '需達成條件：'}
+                              勾選達成的加成條件：
                             </p>
-                            {rows.map((row, idx) => {
+                            {conditionalRows.map((row, idx) => {
                               const isChecked = checkedKeys.includes(row.key);
                               return (
                                 <label
                                   key={row.key}
                                   className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
-                                    idx < rows.length - 1 ? 'border-b border-[#75777d]/10' : ''
+                                    idx < conditionalRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
                                   } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
                                 >
                                   <input
@@ -772,7 +789,7 @@ export default function ExpensesView({
                         )}
                         <div className="flex items-center justify-between mt-2 px-2.5 py-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm border border-black/10 shadow-sm">
                           <span className="text-xs font-bold">預估回饋</span>
-                          <span className="text-base font-bold font-sans">{currentRate}%</span>
+                          <span className="text-base font-bold font-sans">{Math.round(currentRate * 100) / 100}%</span>
                         </div>
                       </div>
                     );

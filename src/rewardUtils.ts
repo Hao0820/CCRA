@@ -24,16 +24,20 @@ export function getTransactionRewardRate(transaction: Transaction, card?: Card):
   const TRIVIAL_CONDITIONS = ['當月有消費、不限金額', '需消費', '不限金額'];
   const checkedKeys = card.achievedConditions ?? [];
 
-  // If scenario has components (tiered rewards), sum the checked ones
+  // If scenario has components (tiered rewards)
   if (scenario.components && scenario.components.length > 0) {
+    const isBase = (i: number) =>
+      scenario.components![i].unlimited === true || i === scenario.components!.length - 1;
+
     const total = scenario.components.reduce((sum, comp, i) => {
+      if (isBase(i)) return sum + comp.rate; // base is always counted
       const key = `${scenario.id}-comp-${i}`;
       return checkedKeys.includes(key) ? sum + comp.rate : sum;
     }, 0);
-    return total > 0 ? total : card.rewardRate;
+    return Math.round(total * 100) / 100;
   }
 
-  // Otherwise check condition-based rate
+  // Condition-based rate
   const realConditions = (scenario.conditions ?? []).filter((c) => !TRIVIAL_CONDITIONS.includes(c.trim()));
   if (realConditions.length > 0) {
     const allConditionsMet = realConditions.every((cond) =>
