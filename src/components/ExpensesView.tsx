@@ -428,32 +428,32 @@ export default function ExpensesView({
                 <article
                   key={tx.id}
                   onClick={() => handleEditClick(tx)}
-                  className="flex justify-between items-center py-3 group hover:bg-[#ece8d9]/20 px-2 rounded-md transition-colors cursor-pointer"
+                  className="flex justify-between items-center py-4 group hover:bg-[#ece8d9]/20 px-2 rounded-md transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     {/* Card image or cash badge */}
-                    <div className="w-12 h-8 shrink-0 rounded-sm overflow-hidden sketch-border-sm bg-[var(--color-surface-container)] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                    <div className="w-16 h-10 shrink-0 rounded-sm overflow-hidden sketch-border-sm bg-[var(--color-surface-container)] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                       {isCash ? (
-                        <span className="text-[10px] font-bold text-on-surface-variant px-1 text-center leading-tight">現金</span>
+                        <span className="text-xs font-bold text-on-surface-variant px-1 text-center leading-tight">現金</span>
                       ) : pairedCard?.cardImage ? (
                         <img src={pairedCard.cardImage} alt={pairedCard.name} className="w-full h-full object-contain p-0.5" />
                       ) : (
-                        <span className="text-[9px] font-bold text-on-surface-variant px-1 text-center leading-tight">{pairedCard?.bankCode}</span>
+                        <span className="text-[10px] font-bold text-on-surface-variant px-1 text-center leading-tight">{pairedCard?.bankCode}</span>
                       )}
                     </div>
 
-                    <div className="text-left flex flex-col gap-0.5">
-                      <div className="flex items-center gap-1.5 pr-2">
-                        <p className="text-base font-bold text-on-surface truncate">
+                    <div className="text-left flex flex-col gap-1">
+                      <div className="flex items-center gap-2 pr-2">
+                        <p className="text-xl font-bold text-on-surface truncate">
                           {tx.merchant}
                         </p>
                         {rewardScenarioGroup && (
-                          <span className="px-1.5 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-[10px] text-on-surface leading-tight shrink-0">
+                          <span className="px-2 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-xs text-on-surface leading-tight shrink-0">
                             {rewardScenarioGroup.label}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
+                      <div className="text-sm text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
                         <span>{translateDateString(tx.date)}</span>
                         {tx.notes && (
                           <span className="italic opacity-70">- {tx.notes}</span>
@@ -463,16 +463,16 @@ export default function ExpensesView({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-base font-bold text-[#ba1a1a] font-sans">
+                    <p className="text-2xl font-bold text-[#ba1a1a] font-sans">
                       -{pairedCard?.currency || currencySymbol}{tx.amount.toLocaleString()}
                     </p>
-                    <p className="text-xs font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">
+                    <p className="text-sm font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">
                       {!isCash && pairedCard && (
                         <span className="text-outline font-normal opacity-70 font-sans">
                           {getTransactionRewardRate(tx, pairedCard)}%
                         </span>
                       )}
-                      <Coins size={12} className="text-[#765469]" />
+                      <Coins size={14} className="text-[#765469]" />
                       <span>+{calculatedPoints} pts</span>
                     </p>
                   </div>
