@@ -270,40 +270,44 @@ export default function CardsView({
         </div>
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/95 to-white/55 px-2.5 pt-6 pb-2.5">
-          <div className="flex items-end justify-between gap-1">
-            <div className="min-w-0">
-              <p className="truncate text-base sm:text-lg font-bold text-primary font-display">
-                {card.name}
-              </p>
-              <div className="mt-1 flex items-center gap-1 text-sm sm:text-base text-on-surface-variant font-bold">
-                <Coins size={16} className="opacity-75 shrink-0" />
-                <span className="truncate font-sans">
-                  {card.currency} {spend.toLocaleString()}
-                </span>
-              </div>
-            </div>
-            <div className="flex shrink-0 flex-col items-end gap-1">
-              {allProgress.slice(0, 2).map((prog, i) => {
-                const remaining = Math.max(prog.target - prog.spend, 0);
-                return (
-                  <span
-                    key={i}
-                    className={`rounded-full border border-black/10 px-2.5 py-1 text-[11px] sm:text-xs font-bold font-sans ${
-                      remaining === 0
-                        ? 'bg-[#c3ecd7] text-[#294e3f]'
-                        : 'bg-[#fcf5c7] text-[#846b12]'
-                    }`}
-                  >
-                    {remaining === 0
-                      ? `[${prog.label}] 已刷滿`
-                      : `[${prog.label}] 再刷 ${card.currency}${Math.ceil(remaining).toLocaleString()}`}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-start gap-1">
+              <div className="min-w-0">
+                <p className="truncate text-base font-bold text-primary font-display">
+                  {card.name}
+                </p>
+                <div className="mt-0.5 flex items-center gap-1 text-xs text-on-surface-variant font-bold">
+                  <Coins size={14} className="opacity-75 shrink-0" />
+                  <span className="truncate font-sans">
+                    {card.currency} {spend.toLocaleString()}
                   </span>
-                );
-              })}
-              <span className="rounded-full bg-[var(--accent-bg)] border border-black/10 px-2.5 py-1 text-xs sm:text-sm font-bold text-[var(--accent-text)]">
+                </div>
+              </div>
+              <span className="shrink-0 rounded-full bg-[var(--accent-bg)] border border-black/10 px-2 py-0.5 text-xs font-bold text-[var(--accent-text)]">
                 {bestScenario?.rate ?? card.rewardRate}%
               </span>
             </div>
+            {allProgress.length > 0 && (
+              <div className="flex flex-col items-start gap-1">
+                {allProgress.slice(0, 2).map((prog, i) => {
+                  const remaining = Math.max(prog.target - prog.spend, 0);
+                  return (
+                    <span
+                      key={i}
+                      className={`rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-bold font-sans max-w-full truncate ${
+                        remaining === 0
+                          ? 'bg-[#c3ecd7] text-[#294e3f]'
+                          : 'bg-[#fcf5c7] text-[#846b12]'
+                      }`}
+                    >
+                      {remaining === 0
+                        ? `[${prog.label}] 已刷滿`
+                        : `[${prog.label}] 再刷 ${card.currency}${Math.ceil(remaining).toLocaleString()}`}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -333,7 +337,7 @@ export default function CardsView({
               我的最愛
             </h3>
             {favoriteCards.length > 0 ? (
-              <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {favoriteCards.map((card, index) => renderCardItem(card, index))}
               </div>
             ) : (
@@ -350,7 +354,7 @@ export default function CardsView({
               {bankKey}
             </h3>
 
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {group.cards.map((card, idx) => renderCardItem(card, groupIndex + idx))}
             </div>
             
