@@ -13,6 +13,31 @@ export function getBestRewardScenarios(card: Card): RewardScenario[] {
   return scenarios.filter((scenario) => scenario.rate === highestRate);
 }
 
+export function getGroupedScenarios(scenarios: RewardScenario[]): { label: string; id: string; original: RewardScenario; rate: number; ids: string[] }[] {
+  const grouped = new Map<string, { label: string; id: string; original: RewardScenario; rate: number; ids: string[] }>();
+  for (const scenario of scenarios) {
+    const key = scenario.spendToCap !== undefined 
+      ? `cap-${scenario.spendToCap}` 
+      : `rate-${scenario.rate}`;
+      
+    if (grouped.has(key)) {
+      const existing = grouped.get(key)!;
+      if (scenario.rate > existing.rate) {
+        existing.id = scenario.id;
+        existing.original = scenario;
+        existing.rate = scenario.rate;
+      }
+      if (!existing.label.split('/').includes(scenario.label)) {
+        existing.label = `${existing.label}/${scenario.label}`;
+      }
+      existing.ids.push(scenario.id);
+    } else {
+      grouped.set(key, { label: scenario.label, id: scenario.id, original: scenario, rate: scenario.rate, ids: [scenario.id] });
+    }
+  }
+  return Array.from(grouped.values());
+}
+
 export function getTransactionRewardRate(transaction: Transaction, card?: Card): number {
   if (transaction.appliedRate !== undefined) return transaction.appliedRate;
   if (!card) return 0;

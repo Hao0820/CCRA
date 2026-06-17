@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Card, Transaction, RewardScenario } from '../types';
-import { calculateTransactionReward, getTransactionRewardRate } from '../rewardUtils';
+import { calculateTransactionReward, getTransactionRewardRate, getGroupedScenarios } from '../rewardUtils';
 import { 
   Plus, 
   ShoppingCart, 
@@ -193,23 +193,7 @@ export default function ExpensesView({
   const rewardScenarios = selectedPaymentCard?.rewardScenarios ?? [];
 
   const groupedScenarios = React.useMemo(() => {
-    const grouped = new Map<number | string, { label: string; id: string; original: RewardScenario }>();
-    for (const scenario of rewardScenarios) {
-      const key = scenario.spendToCap ?? scenario.id;
-      if (grouped.has(key)) {
-        const existing = grouped.get(key)!;
-        if (scenario.rate > existing.original.rate) {
-          existing.id = scenario.id;
-          existing.original = scenario;
-        }
-        if (!existing.label.includes(scenario.label)) {
-          existing.label = `${existing.label}/${scenario.label}`;
-        }
-      } else {
-        grouped.set(key, { label: scenario.label, id: scenario.id, original: scenario });
-      }
-    }
-    return Array.from(grouped.values());
+    return getGroupedScenarios(rewardScenarios);
   }, [rewardScenarios]);
 
   React.useEffect(() => {
@@ -434,9 +418,9 @@ export default function ExpensesView({
               const calculatedPoints = pairedCard
                 ? calculateTransactionReward(tx, pairedCard)
                 : 0;
-              const rewardScenario = pairedCard?.rewardScenarios?.find(
-                (item) => item.id === tx.rewardScenarioId,
-              );
+              const rewardScenarioGroup = pairedCard?.rewardScenarios 
+                ? getGroupedScenarios(pairedCard.rewardScenarios).find((group) => group.ids.includes(tx.rewardScenarioId!))
+                : undefined;
               const config = categoryConfig[tx.category] || categoryConfig['other'];
               const IconComp = config.icon;
 
@@ -462,12 +446,17 @@ export default function ExpensesView({
                       <p className="text-base font-bold text-on-surface line-clamp-1 pr-2">
                         {tx.merchant}
                       </p>
-                      <p className="text-xs text-on-surface-variant font-sans">
-                        {translateDateString(tx.date)}
-                        {tx.notes && (
-                          <span className="italic opacity-70 ml-1.5">- {tx.notes}</span>
+                      <div className="text-xs text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
+                        {rewardScenarioGroup && (
+                          <span className="px-1.5 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-[10px] text-on-surface leading-tight">
+                            {rewardScenarioGroup.label}
+                          </span>
                         )}
-                      </p>
+                        <span>{translateDateString(tx.date)}</span>
+                        {tx.notes && (
+                          <span className="italic opacity-70">- {tx.notes}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
