@@ -557,7 +557,7 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col h-dvh max-w-screen-md mx-auto font-sans transition-colors duration-300 overflow-hidden"
+      className="flex flex-col h-dvh w-full font-sans transition-colors duration-300 overflow-hidden bg-[var(--color-surface-bg)]"
       style={{
         '--accent-bg': accent.background,
         '--accent-text': accent.text,
@@ -593,7 +593,7 @@ export default function App() {
       </header>
 
       {/* Main Pages Content Area */}
-      <main className="app-scroll-area px-4 pb-4">
+      <main className="app-scroll-area w-full max-w-screen-md mx-auto px-4 pb-4">
         {activeTab === 'cards' && (
           <CardsView
             cards={cards}
@@ -683,14 +683,14 @@ export default function App() {
           {/* Tab 1: Expense */}
           <button
             onClick={() => setActiveTab('expense')}
-            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-15 cursor-pointer ${
+            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'expense'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] rounded-xl px-4 py-1.5 ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02]'
+                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
+                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
-            <Edit3 size={18} className={activeTab === 'expense' ? 'mb-0.5' : 'mb-1'} />
-            <span className="text-[12px] uppercase font-bold tracking-wider">
+            <Edit3 size={18} className="mb-0.5" />
+            <span className="text-[12px] uppercase tracking-wider">
               消費
             </span>
           </button>
@@ -698,14 +698,14 @@ export default function App() {
           {/* Tab 2: Cards */}
           <button
             onClick={() => setActiveTab('cards')}
-            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-15 cursor-pointer ${
+            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'cards'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] rounded-xl px-4 py-1.5 ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02]'
+                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
+                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
-            <CreditCard size={18} className={activeTab === 'cards' ? 'mb-0.5' : 'mb-1'} />
-            <span className="text-[12px] uppercase font-bold tracking-wider">
+            <CreditCard size={18} className="mb-0.5" />
+            <span className="text-[12px] uppercase tracking-wider">
               信用卡
             </span>
           </button>
@@ -713,14 +713,14 @@ export default function App() {
           {/* Tab 3: Profile */}
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-15 cursor-pointer ${
+            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'profile'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] rounded-xl px-4 py-1.5 ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02]'
+                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
+                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
-            <User size={18} className={activeTab === 'profile' ? 'mb-0.5' : 'mb-1'} />
-            <span className="text-[12px] uppercase font-bold tracking-wider">
+            <User size={18} className="mb-0.5" />
+            <span className="text-[12px] uppercase tracking-wider">
               個人頁
             </span>
           </button>

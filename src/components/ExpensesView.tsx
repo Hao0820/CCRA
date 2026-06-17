@@ -443,9 +443,16 @@ export default function ExpensesView({
                     </div>
 
                     <div className="text-left flex flex-col gap-0.5">
-                      <p className="text-base font-bold text-on-surface line-clamp-1 pr-2">
-                        {tx.merchant}
-                      </p>
+                      <div className="flex items-center gap-1.5 pr-2">
+                        <p className="text-base font-bold text-on-surface truncate">
+                          {tx.merchant}
+                        </p>
+                        {rewardScenarioGroup && (
+                          <span className="px-1.5 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-[10px] text-on-surface leading-tight shrink-0">
+                            {rewardScenarioGroup.label}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
                         <span>{translateDateString(tx.date)}</span>
                         {tx.notes && (
@@ -460,11 +467,6 @@ export default function ExpensesView({
                       -{pairedCard?.currency || currencySymbol}{tx.amount.toLocaleString()}
                     </p>
                     <p className="text-xs font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">
-                      {rewardScenarioGroup && (
-                        <span className="px-1.5 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-[10px] text-on-surface leading-tight">
-                          {rewardScenarioGroup.label}
-                        </span>
-                      )}
                       {!isCash && pairedCard && (
                         <span className="text-outline font-normal opacity-70 font-sans">
                           {getTransactionRewardRate(tx, pairedCard)}%
