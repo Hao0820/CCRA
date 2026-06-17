@@ -216,7 +216,9 @@ export default function CardsView({
     }
 
     return Array.from(grouped.entries())
-      .map(([target, { label, rate, ids }]) => {
+      .map(([rawTarget, { label, rate, ids }]) => {
+        // Cap the target at the card's credit limit to avoid showing unreachable goals
+        const target = card.creditLimit > 0 ? Math.min(rawTarget, card.creditLimit) : rawTarget;
         // For spend: sum across all scenarios in this group
         const spend = ids.reduce(
           (sum, id) => sum + getCurrentMonthSpend(card.id, id),

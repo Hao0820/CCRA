@@ -444,63 +444,46 @@ export default function ExpensesView({
                 <article
                   key={tx.id}
                   onClick={() => handleEditClick(tx)}
-                  className="flex justify-between items-center py-3.5 group hover:bg-[#ece8d9]/20 px-2 rounded-md transition-colors cursor-pointer"
+                  className="flex justify-between items-center py-3 group hover:bg-[#ece8d9]/20 px-2 rounded-md transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    {/* Circle icon */}
-                    <div className={`w-11 h-11 rounded-full ${config.bgClass} flex items-center justify-center sketch-border-sm shadow-sm scale-95 group-hover:scale-100 transition-transform shrink-0`}>
-                      <IconComp size={18} className={config.iconColor} />
+                    {/* Card image or cash badge */}
+                    <div className="w-12 h-8 shrink-0 rounded-sm overflow-hidden sketch-border-sm bg-[var(--color-surface-container)] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                      {isCash ? (
+                        <span className="text-[10px] font-bold text-on-surface-variant px-1 text-center leading-tight">現金</span>
+                      ) : pairedCard?.cardImage ? (
+                        <img src={pairedCard.cardImage} alt={pairedCard.name} className="w-full h-full object-contain p-0.5" />
+                      ) : (
+                        <span className="text-[9px] font-bold text-on-surface-variant px-1 text-center leading-tight">{pairedCard?.bankCode}</span>
+                      )}
                     </div>
 
-                    <div className="text-left flex flex-col gap-1.5">
-                      <p className="text-lg font-bold text-on-surface line-clamp-1 pr-2">
+                    <div className="text-left flex flex-col gap-0.5">
+                      <p className="text-base font-bold text-on-surface line-clamp-1 pr-2">
                         {tx.merchant}
                       </p>
-                      
-                      <div className="flex flex-wrap items-center gap-x-2 text-xs text-on-surface-variant">
-                        {isCash ? (
-                          <span className="px-1.5 py-0.5 sketch-border-sm bg-[#fcf5c7] font-display text-xs">
-                            現金
-                          </span>
-                        ) : pairedCard && (
-                          <>
-                            <span className={`px-1.5 py-0.5 sketch-border-sm bg-white/60 font-display text-xs`}>
-                              {pairedCard.name} ({pairedCard.lastFour})
-                            </span>
-                            {rewardScenario && (
-                              <span className="text-xs font-bold text-secondary">
-                                {rewardScenario.label} {rewardScenario.rate}%
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-x-2 text-xs text-on-surface-variant">
-                        <span className="font-sans text-xs">
-                          {translateDateString(tx.date)}
-                        </span>
-                        
+                      <p className="text-xs text-on-surface-variant font-sans">
+                        {translateDateString(tx.date)}
                         {tx.notes && (
-                          <span className="italic text-outline opacity-80 max-w-[120px] line-clamp-1">
-                            -{tx.notes}
-                          </span>
+                          <span className="italic opacity-70 ml-1.5">- {tx.notes}</span>
                         )}
-                      </div>
+                      </p>
                     </div>
                   </div>
 
-                  <div className="text-right flex items-center gap-4">
-                    <div className="flex flex-col gap-1 text-right">
-                      <p className="text-[20px] font-bold text-[#ba1a1a] font-sans">
-                        -{pairedCard?.currency || currencySymbol} {tx.amount.toLocaleString()}
-                      </p>
-                      <p className="text-base font-bold text-secondary flex items-center justify-end gap-1">
-                        <Coins size={16} className="text-[#765469]" />
-                        <span>+{calculatedPoints} pts</span>
-                      </p>
-                    </div>
-
+                  <div className="text-right shrink-0">
+                    <p className="text-base font-bold text-[#ba1a1a] font-sans">
+                      -{pairedCard?.currency || currencySymbol}{tx.amount.toLocaleString()}
+                    </p>
+                    <p className="text-xs font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">
+                      {!isCash && pairedCard && (
+                        <span className="text-outline font-normal opacity-70 font-sans">
+                          {getTransactionRewardRate(tx, pairedCard)}%
+                        </span>
+                      )}
+                      <Coins size={12} className="text-[#765469]" />
+                      <span>+{calculatedPoints} pts</span>
+                    </p>
                   </div>
                 </article>
               );
