@@ -557,15 +557,15 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen flex flex-col pt-20 pb-24 md:pb-8 max-w-screen-md mx-auto relative px-4 font-sans transition-colors duration-300"
+      className="flex flex-col h-dvh max-w-screen-md mx-auto font-sans transition-colors duration-300 overflow-hidden"
       style={{
         '--accent-bg': accent.background,
         '--accent-text': accent.text,
       } as React.CSSProperties}
     >
       
-      {/* TopAppBar - Notebook Head Line */}
-      <header className={`fixed top-0 left-0 right-0 z-40 bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+      {/* TopAppBar */}
+      <header className={`shrink-0 bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
         <div className="flex justify-between items-center w-full max-w-screen-md mx-auto">
           {/* Symmetrical Left Spacer to keep title centered */}
           <div className="w-9 h-9" />
@@ -593,7 +593,7 @@ export default function App() {
       </header>
 
       {/* Main Pages Content Area */}
-      <main className="flex-grow mt-4 w-full">
+      <main className="app-scroll-area px-4 pb-4">
         {activeTab === 'cards' && (
           <CardsView
             cards={cards}
@@ -676,8 +676,8 @@ export default function App() {
         )}
       </main>
 
-      {/* Bottom Sticky Tablet Navigator */}
-      <nav className={`fixed bottom-0 left-0 right-0 z-50 pb-safe bg-[var(--color-surface-bg)] border-t-2 border-outline select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+      {/* Bottom Tab Navigator — outside the scroll area so it never scrolls away */}
+      <nav className={`shrink-0 pb-safe bg-[var(--color-surface-bg)] border-t-2 border-outline select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
         <div className="flex justify-around items-center h-20 px-4 w-full max-w-screen-md mx-auto">
           
           {/* Tab 1: Expense */}

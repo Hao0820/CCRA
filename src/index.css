@@ -44,6 +44,20 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
 /* Custom classes for handwritten/pencil vibe */
 .font-handwriting {
   font-family: "Yomogi", cursive, sans-serif;
