@@ -86,6 +86,7 @@ export default function ExpensesView({
   const [category, setCategory] = useState<Transaction['category']>('shopping');
   const [notes, setNotes] = useState('');
   const [contentView, setContentView] = useState<'list' | 'breakdown'>('list');
+  const [filterCardId, setFilterCardId] = useState<string>('all');
 
   // Editing transaction state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -164,6 +165,7 @@ export default function ExpensesView({
   // Get filtered transactions matching the month
   const filteredTransactions = transactions
     .filter((tx) => getTransactionMonthStr(tx.date) === selectedMonth)
+    .filter((tx) => filterCardId === 'all' || tx.cardId === filterCardId)
     .sort((a, b) => b.date.localeCompare(a.date));
 
   // Compute Total Expense for the selected month (we can sum up directly or group by currency)
@@ -355,33 +357,55 @@ export default function ExpensesView({
         </button>
       </section>
 
+      {/* Filter by Card/Cash */}
+      <section className="relative -mt-2 mb-4">
+        <select
+          value={filterCardId}
+          onChange={(e) => setFilterCardId(e.target.value)}
+          className="w-full appearance-none border-2 border-outline rounded-md focus:border-primary focus:outline-none bg-white pl-4 pr-10 py-2.5 text-base font-bold font-sans text-center sketch-border-sm cursor-pointer"
+        >
+          <option value="all">全部消費</option>
+          <option value="cash">現金 (Cash)</option>
+          {cards.map((card) => (
+            <option key={card.id} value={card.id}>
+              {card.name} (...{card.lastFour})
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-on-surface-variant font-bold">
+          <svg className="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+          </svg>
+        </div>
+      </section>
+
       {/* Summary Score Blocks */}
-      <section className="flex gap-4 flex-col sm:flex-row">
-        {/* Total Expense card */}
-        <div className="flex-1 bg-[var(--color-surface-bg)] p-4 sketch-border pencil-shadow transform -rotate-1 hover:rotate-0 transition-transform relative">
-          <p className="text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1">
+      <section className="flex flex-row sketch-border pencil-shadow overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform rounded-xl">
+        {/* Total Expense */}
+        <div className="flex-1 bg-[var(--color-surface-bg)] p-3 sm:p-4 relative border-r border-outline/30 min-w-0">
+          <p className="text-xs sm:text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1 truncate">
             當月總消費
           </p>
-          <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1">
-            <span className="text-xl font-sans">{currencySymbol}</span>
-            <span className="text-3xl font-sans">{totalExpense.toLocaleString()}</span>
+          <p className="text-lg sm:text-2xl font-bold font-display text-primary flex items-baseline gap-1 truncate">
+            <span className="text-sm sm:text-xl font-sans">{currencySymbol}</span>
+            <span className="text-xl sm:text-3xl font-sans truncate">{totalExpense.toLocaleString()}</span>
           </p>
-          <div className="absolute bottom-2 right-3 opacity-15">
-            <Layers size={40} className="text-primary" />
+          <div className="absolute bottom-1 right-2 sm:bottom-2 sm:right-3 opacity-15">
+            <Layers size={32} className="text-primary sm:w-10 sm:h-10" />
           </div>
         </div>
 
-        {/* Total Rewards points card */}
-        <div className="flex-1 bg-[var(--accent-bg)] p-4 sketch-border pencil-shadow transform rotate-1 hover:rotate-0 transition-transform relative">
-          <p className="text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1">
+        {/* Total Rewards points */}
+        <div className="flex-1 bg-[var(--accent-bg)] p-3 sm:p-4 relative min-w-0">
+          <p className="text-xs sm:text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1 truncate">
             累計回饋點數
           </p>
-          <p className="text-2xl font-bold font-display text-primary flex items-baseline gap-1.5">
-            <span className="text-3xl font-sans">{totalRewardsPoints.toLocaleString()}</span>
-            <span className="text-sm font-handwriting">pts / 點</span>
+          <p className="text-lg sm:text-2xl font-bold font-display text-primary flex items-baseline gap-1 truncate">
+            <span className="text-xl sm:text-3xl font-sans truncate">{totalRewardsPoints.toLocaleString()}</span>
+            <span className="text-xs sm:text-sm font-handwriting shrink-0">pts</span>
           </p>
-          <div className="absolute bottom-2 right-3 opacity-15">
-            <Coins size={40} className="text-primary" />
+          <div className="absolute bottom-1 right-2 sm:bottom-2 sm:right-3 opacity-15">
+            <Coins size={32} className="text-primary sm:w-10 sm:h-10" />
           </div>
         </div>
       </section>
@@ -447,11 +471,6 @@ export default function ExpensesView({
                         <p className="text-xl font-bold text-on-surface truncate">
                           {tx.merchant}
                         </p>
-                        {rewardScenarioGroup && (
-                          <span className="px-2 py-0.5 bg-[var(--color-surface-container)]/80 sketch-border-sm font-display text-xs text-on-surface leading-tight shrink-0">
-                            {rewardScenarioGroup.label}
-                          </span>
-                        )}
                       </div>
                       <div className="text-sm text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
                         <span>{translateDateString(tx.date)}</span>
@@ -463,7 +482,7 @@ export default function ExpensesView({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-2xl font-bold text-[#ba1a1a] font-sans">
+                    <p className="text-[22px] font-bold text-[#ba1a1a] font-sans leading-tight">
                       -{pairedCard?.currency || currencySymbol}{tx.amount.toLocaleString()}
                     </p>
                     <p className="text-sm font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">

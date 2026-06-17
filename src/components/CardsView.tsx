@@ -253,7 +253,7 @@ export default function CardsView({
         }}
         className={`sketch-border sketch-shadow cursor-pointer transition-all duration-300 bg-white/90 ${rotation} hover:scale-[1.02] flex items-center gap-3 p-3`}
       >
-        <div className="w-24 h-16 shrink-0 bg-[var(--color-surface-container-low)] rounded-md overflow-hidden flex items-center justify-center sketch-border-sm relative">
+        <div className="w-[110px] h-[70px] shrink-0 bg-[var(--color-surface-container-low)] rounded-md overflow-hidden flex items-center justify-center sketch-border-sm relative">
           {card.cardImage ? (
             <img
               src={card.cardImage}
@@ -262,40 +262,48 @@ export default function CardsView({
             />
           ) : (
             <div className="flex flex-col items-center gap-0.5 text-[#75777d]">
-              <CreditCard size={20} />
-              <span className="text-[8px]">暫無圖片</span>
+              <CreditCard size={24} />
+              <span className="text-[10px]">暫無圖片</span>
             </div>
-          )}
-          {card.isFavorite && (
-            <Heart size={14} fill="currentColor" className="absolute left-1 top-1 text-[#ba1a1a]" />
           )}
         </div>
 
-        <div className="flex-1 min-w-0 flex flex-col gap-1">
+        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
           <div className="flex justify-between items-start gap-1">
-            <p className="truncate text-lg font-bold text-primary font-display leading-tight">
-              {card.name} <span className="text-xs text-on-surface-variant font-sans font-normal ml-1">...{card.lastFour}</span>
+            <p className="truncate text-[22px] font-bold text-primary font-display leading-tight">
+              {card.name} <span className="text-sm text-on-surface-variant font-sans font-normal ml-1">...{card.lastFour}</span>
             </p>
-            <span className="shrink-0 rounded-full bg-[var(--accent-bg)] px-2 py-0.5 text-xs font-bold text-[var(--accent-text)] sketch-border-sm">
-              {bestScenario?.rate ?? card.rewardRate}%
-            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdateCard({ ...card, isFavorite: !card.isFavorite });
+              }}
+              className="shrink-0 p-1 rounded-full hover:bg-black/5 transition-colors active:scale-95"
+            >
+              {card.isFavorite ? (
+                <Heart size={20} fill="currentColor" className="text-[#ba1a1a]" />
+              ) : (
+                <Heart size={20} className="text-on-surface-variant" />
+              )}
+            </button>
           </div>
 
-          <div className="flex items-center gap-1 text-sm text-on-surface-variant font-bold">
-            <Coins size={14} className="opacity-75 shrink-0" />
+          <div className="flex items-center gap-1 text-base text-on-surface-variant font-bold">
+            <Coins size={16} className="opacity-75 shrink-0" />
             <span className="truncate font-sans">
               {card.currency} {spend.toLocaleString()}
             </span>
           </div>
 
           {allProgress.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1 mt-1">
+            <div className="flex flex-wrap items-center gap-1.5 mt-1">
               {allProgress.slice(0, 2).map((prog, i) => {
                 const remaining = Math.max(prog.target - prog.spend, 0);
                 return (
                   <span
                     key={i}
-                    className={`rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-bold font-sans ${
+                    className={`rounded-full border border-black/10 px-2 py-0.5 text-xs font-bold font-sans ${
                       remaining === 0
                         ? 'bg-[#c3ecd7] text-[#294e3f]'
                         : 'bg-[#fcf5c7] text-[#846b12]'
