@@ -26,14 +26,37 @@ export function getTransactionRewardRate(transaction: Transaction, card?: Card):
 
   // If scenario has components (tiered rewards)
   if (scenario.components && scenario.components.length > 0) {
-    const isBase = (i: number) =>
-      scenario.components![i].unlimited === true || i === scenario.components!.length - 1;
+    const hasExclusive = scenario.components.some((c) => c.exclusive);
 
-    const total = scenario.components.reduce((sum, comp, i) => {
-      if (isBase(i)) return sum + comp.rate; // base is always counted
-      const key = `${scenario.id}-comp-${i}`;
-      return checkedKeys.includes(key) ? sum + comp.rate : sum;
-    }, 0);
+    let total = 0;
+    if (hasExclusive) {
+      // Base: all non-exclusive unlimited components
+      scenario.components.forEach((comp, i) => {
+        if (!comp.exclusive && (comp.unlimited === true)) {
+          total += comp.rate;
+        }
+      });
+      // Exclusive: find the selected one
+      const selectedExclusive = scenario.components.find((comp, i) => {
+        if (!comp.exclusive) return false;
+        const key = `${scenario.id}-comp-${i}`;
+        return checkedKeys.includes(key);
+      });
+      if (selectedExclusive) total += selectedExclusive.rate;
+    } else {
+      // Standard: last component is base, others need checkbox
+      const isBase = (i: number) =>
+        scenario.components![i].unlimited === true || i === scenario.components!.length - 1;
+      scenario.components.forEach((comp, i) => {
+        if (isBase(i)) {
+          total += comp.rate;
+        } else {
+          const key = `${scenario.id}-comp-${i}`;
+          if (checkedKeys.includes(key)) total += comp.rate;
+        }
+      });
+    }
+
     return Math.round(total * 100) / 100;
   }
 

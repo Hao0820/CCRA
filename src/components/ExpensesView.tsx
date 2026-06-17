@@ -701,42 +701,42 @@ export default function ExpensesView({
 
                     type Row = { key: string; label: string; rate: number };
 
-                    // Split components into base (always counted) vs conditional (need checkbox)
-                    // A component is "base" if it's unlimited OR it's the last one with no meaningful condition marker
-                    const isBaseComponent = (comp: typeof components[0], idx: number) =>
-                      comp.unlimited === true || idx === components.length - 1;
-
+                    // Separate exclusive (radio), additive (checkbox), base (always counted)
+                    const exclusiveRows: Row[] = [];
+                    let additiveRows: Row[] = [];
                     let baseRate = 0;
-                    let conditionalRows: Row[] = [];
 
                     if (components.length > 0) {
+                      // Check if any component is marked exclusive
+                      const hasExclusive = components.some((c) => c.exclusive);
                       components.forEach((comp, i) => {
-                        if (isBaseComponent(comp, i)) {
+                        const key = `${selectedScenario.id}-comp-${i}`;
+                        if (comp.exclusive) {
+                          exclusiveRows.push({ key, label: comp.description, rate: comp.rate });
+                        } else if (!hasExclusive && (comp.unlimited !== true && i !== components.length - 1)) {
+                          additiveRows.push({ key, label: comp.description, rate: comp.rate });
+                        } else if (comp.unlimited === true || (!hasExclusive && i === components.length - 1)) {
                           baseRate += comp.rate;
-                        } else {
-                          conditionalRows.push({
-                            key: `${selectedScenario.id}-comp-${i}`,
-                            label: comp.description,
-                            rate: comp.rate,
-                          });
                         }
                       });
                     } else {
-                      // Condition-based (no components): treat entire scenario rate as conditional
-                      conditionalRows = realConditions.map((cond) => ({
+                      // Condition-based (no components)
+                      additiveRows = realConditions.map((cond) => ({
                         key: `${selectedScenario.id}-${cond}`,
                         label: cond,
                         rate: selectedScenario.rate,
                       }));
                     }
 
-                    const hasConditionalRows = conditionalRows.length > 0;
+                    const hasExclusiveRows = exclusiveRows.length > 0;
+                    const hasAdditiveRows = additiveRows.length > 0;
                     const checkedKeys = card?.achievedConditions ?? [];
-                    const checkedRate = conditionalRows.reduce(
-                      (sum, row) => (checkedKeys.includes(row.key) ? sum + row.rate : sum),
-                      0
-                    );
-                    const currentRate = baseRate + checkedRate;
+
+                    // For exclusive: only one key selected (the last one in checkedKeys that is in exclusiveRows)
+                    const selectedExclusiveKey = exclusiveRows.map((r) => r.key).find((k) => checkedKeys.includes(k)) ?? null;
+                    const exclusiveRate = exclusiveRows.find((r) => r.key === selectedExclusiveKey)?.rate ?? 0;
+                    const additiveRate = additiveRows.reduce((sum, row) => checkedKeys.includes(row.key) ? sum + row.rate : sum, 0);
+                    const currentRate = baseRate + exclusiveRate + additiveRate;
 
                     return (
                       <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
@@ -746,18 +746,63 @@ export default function ExpensesView({
                             {selectedScenario.limit}
                           </div>
                         )}
-                        {hasConditionalRows && card && onUpdateCard && (
+
+                        {/* Exclusive (radio) rows — mutually exclusive modes */}
+                        {hasExclusiveRows && card && onUpdateCard && (
+                          <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
+                            <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
+                              選擇回饋模式（擇一）：
+                            </p>
+                            {exclusiveRows.map((row, idx) => {
+                              const isSelected = selectedExclusiveKey === row.key;
+                              return (
+                                <label
+                                  key={row.key}
+                                  className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
+                                    idx < exclusiveRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
+                                  } ${isSelected ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name={`exclusive-${selectedScenario.id}`}
+                                    className="w-4 h-4 accent-primary shrink-0"
+                                    checked={isSelected}
+                                    onChange={() => {
+                                      const current = (card.achievedConditions || []).filter(
+                                        (k) => !exclusiveRows.some((r) => r.key === k)
+                                      );
+                                      onUpdateCard({ ...card, achievedConditions: [...current, row.key] });
+                                    }}
+                                  />
+                                  <span className={`flex-1 text-xs leading-snug ${isSelected ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                    {row.label}
+                                  </span>
+                                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold font-sans border ${
+                                    isSelected
+                                      ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-black/10'
+                                      : 'bg-white/60 text-on-surface-variant border-[#75777d]/20'
+                                  }`}>
+                                    +{row.rate}%
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Additive (checkbox) rows */}
+                        {hasAdditiveRows && card && onUpdateCard && (
                           <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
                             <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
                               勾選達成的加成條件：
                             </p>
-                            {conditionalRows.map((row, idx) => {
+                            {additiveRows.map((row, idx) => {
                               const isChecked = checkedKeys.includes(row.key);
                               return (
                                 <label
                                   key={row.key}
                                   className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
-                                    idx < conditionalRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
+                                    idx < additiveRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
                                   } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
                                 >
                                   <input
@@ -787,6 +832,7 @@ export default function ExpensesView({
                             })}
                           </div>
                         )}
+
                         <div className="flex items-center justify-between mt-2 px-2.5 py-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm border border-black/10 shadow-sm">
                           <span className="text-xs font-bold">預估回饋</span>
                           <span className="text-base font-bold font-sans">{Math.round(currentRate * 100) / 100}%</span>

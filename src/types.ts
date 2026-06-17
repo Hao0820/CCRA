@@ -9,6 +9,7 @@ export interface RewardComponent {
   rewardCap?: number;
   capPeriod?: string;
   unlimited?: boolean;
+  exclusive?: boolean; // mutually exclusive with other exclusive components (radio button)
 }
 
 export interface RewardScenario {
