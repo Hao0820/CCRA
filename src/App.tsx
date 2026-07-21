@@ -213,8 +213,20 @@ export default function App() {
       setSyncStatus('loading');
       setSyncError('');
 
-      const [profileResult, cardsResult, transactionsResult] =
-        await Promise.all([
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                '雲端連線逾時（超過 10 秒）。Supabase 免費專案可能已自動休眠，請至 Supabase Dashboard 點選 Restore project 喚醒專案。',
+              ),
+            ),
+          10000,
+        ),
+      );
+
+      try {
+        const fetchPromise = Promise.all([
           supabase
             .from('profiles')
             .select('display_name, cash_balance, accent_color')
@@ -232,41 +244,56 @@ export default function App() {
             .order('transaction_date'),
         ]);
 
-      const error =
-        profileResult.error ?? cardsResult.error ?? transactionsResult.error;
-      if (error) {
+        const [profileResult, cardsResult, transactionsResult] =
+          await Promise.race([fetchPromise, timeoutPromise]);
+
+        const error =
+          profileResult.error ?? cardsResult.error ?? transactionsResult.error;
+        if (error) {
+          if (!cancelled) {
+            const errMsg = `雲端資料載入失敗：${error.message}（若專案休眠中請至 Supabase 喚醒專案）`;
+            setAuthError(errMsg);
+            setSyncStatus('error');
+            setSyncError(errMsg);
+          }
+          return;
+        }
+
+        const cloudCards = (cardsResult.data ?? [])
+          .map((row) => row.card_data as Card)
+          .filter((card) => card?.id)
+          .map((card) => hydrateCardRewards(card, catalog));
+        const cloudTransactions = (transactionsResult.data ?? [])
+          .map((row) => row.transaction_data as Transaction)
+          .filter((transaction) => transaction?.id);
         if (!cancelled) {
-          setAuthError(`雲端資料載入失敗：${error.message}`);
+          setCards(cloudCards);
+          setTransactions(cloudTransactions);
+
+          const profile = profileResult.data;
+          const cloudCash = Number(profile.cash_balance);
+          const cloudAccent = profile.accent_color as AccentColor;
+          setCashBalance(cloudCash);
+          if (ACCENT_COLORS[cloudAccent]) setAccentColor(cloudAccent);
+
+          setCloudReadyUserId(authUser.id);
+          setSyncStatus('synced');
+          setLastSyncedAt(new Date());
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const errMsg =
+            err instanceof Error
+              ? err.message
+              : '無法連線至 Supabase 資料庫，專案可能已自動休眠。';
+          setAuthError(errMsg);
           setSyncStatus('error');
-          setSyncError(`雲端資料載入失敗：${error.message}`);
+          setSyncError(errMsg);
+        }
+      } finally {
+        if (!cancelled) {
           setAuthLoading(false);
         }
-        return;
-      }
-
-      const cloudCards = (cardsResult.data ?? [])
-        .map((row) => row.card_data as Card)
-        .filter((card) => card?.id)
-        .map((card) => hydrateCardRewards(card, catalog));
-      const cloudTransactions = (transactionsResult.data ?? [])
-        .map((row) => row.transaction_data as Transaction)
-        .filter((transaction) => transaction?.id);
-      if (!cancelled) {
-        setCards(cloudCards);
-        setTransactions(cloudTransactions);
-
-        const profile = profileResult.data;
-        const cloudCash = Number(profile.cash_balance);
-        const cloudAccent = profile.accent_color as AccentColor;
-        setCashBalance(cloudCash);
-        if (ACCENT_COLORS[cloudAccent]) setAccentColor(cloudAccent);
-      }
-
-      if (!cancelled) {
-        setCloudReadyUserId(authUser.id);
-        setSyncStatus('synced');
-        setLastSyncedAt(new Date());
-        setAuthLoading(false);
       }
     };
 
