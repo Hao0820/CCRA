@@ -60,7 +60,7 @@ export interface Transaction {
   cardId: string; // references Card.id
   rewardScenarioId?: string;
   appliedRate?: number; // Snapshot of the rate applied at creation time
-  category: 'shopping' | 'dining' | 'transport' | 'entertainment' | 'medical' | 'social' | 'home' | 'other';
+  category?: string;
   notes?: string;
   pointsOverride?: number; // optional manual points, otherwise calculated
 }

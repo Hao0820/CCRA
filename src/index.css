@@ -58,6 +58,15 @@ body {
   overscroll-behavior-y: contain;
 }
 
+/* Prevent iOS Safari auto-zoom on form inputs */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Custom classes for handwritten/pencil vibe */
 .font-handwriting {
   font-family: "Yomogi", cursive, sans-serif;

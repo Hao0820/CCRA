@@ -112731,187 +112731,317 @@
             "source_url": "https://cdn.boostus.cc/3685e330ec5277a9dd5661c61f2bc55811f5a628/1759889483647-8d00144-a375-6eab-825b-a736bdccad8",
             "usage_note": "圖片著作權屬原權利人；僅作卡片辨識。"
           },
-          "description": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月",
+          "description": "生活玩家精選通路最高10%（加碼9%每戶每月上限500點）、海外指定實體5%、國內外一般1%無上限",
           "promotion": null,
-          "strengths": [],
+          "strengths": [
+            {
+              "title": "10%",
+              "brief": "生活玩家精選通路最高 10% 現金積點",
+              "detail": "以指定星展帳戶設定信用卡自動轉帳付款，享生活玩家精選通路（蝦皮、淘寶、外送、遊戲、串流影音、潮玩動漫等）最高10%現金積點回饋（含基本1%無上限 + 精選加碼9%，每戶每月加碼上限500點，約刷NT,555達上限）。\n\n※2026/07/01起取消LINE Pay加碼回饋"
+            },
+            {
+              "title": "5%",
+              "brief": "海外指定國家實體消費最高 5% 回饋",
+              "detail": "於日本、韓國、泰國、新加坡、美洲、歐洲地區實體商店持卡或感應支付（Apple Pay/Samsung Pay），享最高5%現金積點（含基本1%無上限 + 海外實體加碼4%，每戶每月加碼上限500點，約刷NT,500達上限）。"
+            },
+            {
+              "title": "1%",
+              "brief": "國內外一般消費 1% 現金積點無上限",
+              "detail": "以指定星展帳戶設定信用卡自動轉帳付款，享國內及國外一般消費1%現金積點無上限。"
+            },
+            {
+              "title": "首刷禮",
+              "brief": "新戶首刷享 1,400 貝殼幣與專屬虛寶",
+              "detail": "新戶申辦正卡核卡後30天內完成星展Card+登入、電子帳單與單筆一般消費滿NT,000，享1,400貝殼幣。登入遊戲開通卡友身分送緹莉星夢展航造型與限定頭像框！"
+            }
+          ],
           "reward_scenarios": [
             {
-              "id": "68e5c90e30916d7ed75d9bf4-5d6ce4778a0112506b5ed6ae",
-              "label": "國內",
-              "rate": 1.2,
-              "description": "現金積點回饋最優1.2%，無上限",
-              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享最高1.2% 現金積點回饋無上限",
-              "limit": "無上限",
-              "channels": [
-                "國內一般消費"
-              ],
-              "conditions": [],
-              "unlimited": true,
-              "components": [
-                {
-                  "id": "68e5cc6b8f8f195f4a7add75",
-                  "rate": 1.2,
-                  "description": "現金積點回饋最優1.2%，無上限",
-                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享最高1.2% 現金積點回饋無上限",
-                  "unlimited": true,
-                  "conditions": [],
-                  "channels": "國內一般消費",
-                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享最高1.2% 現金積點回饋無上限"
-                }
-              ],
-              "sourceUrl": "https://icard.ai/home/all_cards"
-            },
-            {
-              "id": "68e5c90e30916d7ed75d9bf4-5d6ce3288a0112506b5ed6a9",
-              "label": "海外",
-              "rate": 2.5,
-              "description": "現金積點回饋最優2.5%，無上限",
-              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享最高2.5% 現金積點回饋無上限",
-              "limit": "無上限",
-              "channels": [
-                "海外一般消費"
-              ],
-              "conditions": [],
-              "unlimited": true,
-              "components": [
-                {
-                  "id": "68e5cc6c8f8f195f4a7add77",
-                  "rate": 2.5,
-                  "description": "現金積點回饋最優2.5%，無上限",
-                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享最高2.5% 現金積點回饋無上限",
-                  "unlimited": true,
-                  "conditions": [],
-                  "channels": "海外一般消費",
-                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享最高2.5% 現金積點回饋無上限"
-                }
-              ],
-              "sourceUrl": "https://icard.ai/home/all_cards"
-            },
-            {
-              "id": "68e5c90e30916d7ed75d9bf4-5f02b3004ae89cf28c8e1eed",
-              "label": "網購",
-              "rate": 8.8,
-              "description": "現金積點回饋最優8.8%，每月上限現金積點回饋1000點",
-              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月",
-              "limit": "每月上限 1,000 點；約刷 NT$11,364 達加碼上限",
+              "id": "68e5c90e30916d7ed75d9bf4-selected-10",
+              "label": "精選/網購",
+              "rate": 10,
+              "description": "現金積點回饋最優10%，每月上限現金積點回饋500點",
+              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，生活玩家精選通路享最高10%回饋！加碼9%每戶每月上限500點",
+              "limit": "每月上限 500 點；約刷 NT,555 達加碼上限；另含無上限回饋",
               "channels": [
                 "蝦皮購物",
-                "LINE Pay合作店家"
+                "淘寶網",
+                "Uber Eats",
+                "foodpanda",
+                "麥當勞",
+                "肯德基",
+                "摩斯漢堡",
+                "必勝客",
+                "拿坡里",
+                "App Store",
+                "Google Play",
+                "Garena",
+                "Steam",
+                "PlayStation",
+                "Nintendo",
+                "MyCard",
+                "GASH",
+                "巴哈姆特",
+                "YouTube Premium",
+                "Netflix",
+                "Disney+",
+                "Spotify",
+                "KKBOX",
+                "Twitch",
+                "TikTok",
+                "POPMART",
+                "野獸國",
+                "Animate",
+                "寬宏售票",
+                "KKTIX",
+                "年代售票",
+                "拓元售票",
+                "NOVA",
+                "三創生活園區",
+                "Logitech官網"
               ],
-              "conditions": [],
-              "rewardCap": 1000,
+              "conditions": [
+                "以指定星展帳戶設定信用卡自動轉帳付款"
+              ],
+              "rewardCap": 500,
               "capPeriod": "month",
-              "spendToCap": 11363.64,
+              "spendToCap": 5555.56,
               "unlimited": false,
               "components": [
                 {
                   "id": "68e5cc6e8f8f195f4a7add79",
-                  "rate": 8.8,
-                  "description": "現金積點回饋最優8.8%，每月上限現金積點回饋1000點",
-                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月",
+                  "rate": 10,
+                  "description": "現金積點回饋最優10%，每月上限現金積點回饋500點",
+                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，生活玩家精選通路享最高10%回饋！加碼9%每戶每月上限500點",
                   "unlimited": false,
-                  "rewardCap": 1000,
+                  "rewardCap": 500,
                   "rewardCapUnit": "點",
                   "capPeriod": "month",
-                  "conditions": [],
-                  "channels": "APP Store、Google Play、競舞娛樂Garena、GASH橘子、MyCard官網、Nintendo、PlayStation、Steam、Acer宏碁、ASUS Store官網、logitech官網、NOVA、三創生活園區、寬宏售票、華娛KKTIX、年代售票、拓元售票、YouTube Premium、Apple TV+、Netflix、Disney+、Spotify、愛奇藝、CatchPlay、KKBOX、KKTV、LINE TV、LiTV 線上影視、愛爾達電視、LINE Pay合作店家、Uber Eats、foodpanda、麥當勞、肯德基KFC、摩斯漢堡、21風味館、拿坡里、蝦皮購物、必勝客",
-                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月\n\n*含存戶回饋升級之國內1.2%以及國外2.5%回饋\n\n*「生活玩家精選通路」之消費若經系統判斷為 NCCC 平台小額支付特店，則不屬於一般消費，不適用0.2%國內基本回饋以及存戶回饋升級之國內1.2%現金積點回饋，故此類小額支付消費僅回饋本精選通路適用之8.8%現金積點（上限1,000點）"
+                  "conditions": [
+                    "以指定星展帳戶設定信用卡自動轉帳付款"
+                  ],
+                  "channels": "蝦皮購物、淘寶網、Uber Eats、foodpanda、麥當勞、肯德基KFC、摩斯漢堡、必勝客、拿坡里、APP Store、Google Play、競舞娛樂Garena、GASH橘子、MyCard官網、Nintendo、PlayStation、Steam、巴哈姆特、YouTube Premium、Apple TV+、Netflix、Disney+、Spotify、KKBOX、Twitch、TikTok、愛奇藝、CatchPlay、KKTV、LiTV、POPMART、野獸國、Animate、鼎美玩具、KHTOY、TOYSNAP、東海模型、寬宏售票、華娛KKTIX、年代售票、拓元售票、Acer宏碁、ASUS Store官網、logitech官網、NOVA、三創生活園區",
+                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，享生活玩家精選通路最高10%回饋！\n\n*含基本1%無上限 + 精選加碼9%（每月每戶上限500點，約刷NT,555達上限）\n*2026/07/01起已取消LINE Pay加碼回饋"
                 }
               ],
-              "sourceUrl": "https://icard.ai/home/all_cards"
+              "sourceUrl": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html"
+            },
+            {
+              "id": "68e5c90e30916d7ed75d9bf4-overseas-physical-5",
+              "label": "海外實體",
+              "rate": 5,
+              "description": "現金積點回饋最優5%，每月上限現金積點回饋500點",
+              "rule": "於日本、韓國、泰國、新加坡、美洲、歐洲地區實體商店持卡或感應支付消費，享最高5%現金積點！加碼4%每戶每月上限500點",
+              "limit": "每月上限 500 點；約刷 NT,500 達加碼上限；另含無上限回饋",
+              "channels": [
+                "海外實體消費"
+              ],
+              "conditions": [
+                "以指定星展帳戶設定信用卡自動轉帳付款"
+              ],
+              "rewardCap": 500,
+              "capPeriod": "month",
+              "spendToCap": 12500,
+              "unlimited": false,
+              "components": [
+                {
+                  "id": "68e5c90e30916d7ed75d9bf4-overseas-comp",
+                  "rate": 5,
+                  "description": "現金積點回饋最優5%，每月上限現金積點回饋500點",
+                  "rule": "於日本、韓國、泰國、新加坡、美洲、歐洲實體商店消費享最高5%現金積點",
+                  "unlimited": false,
+                  "rewardCap": 500,
+                  "rewardCapUnit": "點",
+                  "capPeriod": "month",
+                  "conditions": [
+                    "以指定星展帳戶設定信用卡自動轉帳付款"
+                  ],
+                  "channels": "日本、韓國、泰國、新加坡、美洲、歐洲實體商店消費或Apple Pay/Samsung Pay實體感應支付",
+                  "detail": "含原1%基本回饋無上限 + 海外實體加碼4%（每戶每月加碼上限500點，可刷NT,500）"
+                }
+              ],
+              "sourceUrl": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html"
+            },
+            {
+              "id": "68e5c90e30916d7ed75d9bf4-overseas-general-1",
+              "label": "國外一般",
+              "rate": 1,
+              "description": "現金積點回饋最優1%，無上限",
+              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，國外一般消費享1%現金積點回饋無上限",
+              "limit": "無上限",
+              "channels": [
+                "國外一般消費"
+              ],
+              "conditions": [
+                "以指定星展帳戶設定信用卡自動轉帳付款"
+              ],
+              "unlimited": true,
+              "components": [
+                {
+                  "id": "68e5c90e30916d7ed75d9bf4-overseas-gen-comp",
+                  "rate": 1,
+                  "description": "現金積點回饋最優1%，無上限",
+                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享1%現金積點回饋無上限",
+                  "unlimited": true,
+                  "conditions": [
+                    "以指定星展帳戶設定信用卡自動轉帳付款"
+                  ],
+                  "channels": "國外一般消費",
+                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，享國外一般消費1%現金積點回饋無上限"
+                }
+              ],
+              "sourceUrl": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html"
+            },
+            {
+              "id": "68e5c90e30916d7ed75d9bf4-domestic-general-1",
+              "label": "國內一般",
+              "rate": 1,
+              "description": "現金積點回饋最優1%，無上限",
+              "rule": "以指定星展帳戶設定信用卡自動轉帳付款，國內一般消費享1%現金積點回饋無上限",
+              "limit": "無上限",
+              "channels": [
+                "國內一般消費"
+              ],
+              "conditions": [
+                "以指定星展帳戶設定信用卡自動轉帳付款"
+              ],
+              "unlimited": true,
+              "components": [
+                {
+                  "id": "68e5c90e30916d7ed75d9bf4-domestic-gen-comp",
+                  "rate": 1,
+                  "description": "現金積點回饋最優1%，無上限",
+                  "rule": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享1%現金積點回饋無上限",
+                  "unlimited": true,
+                  "conditions": [
+                    "以指定星展帳戶設定信用卡自動轉帳付款"
+                  ],
+                  "channels": "國內一般消費",
+                  "detail": "以指定星展帳戶設定信用卡自動轉帳付款，享國內一般消費1%現金積點回饋無上限"
+                }
+              ],
+              "sourceUrl": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html"
             }
           ],
           "existing_customer_or_regular_rewards": {
             "feature_summary": [
-              "國內最高 1.2%：無上限",
-              "海外最高 2.5%：無上限",
-              "網購最高 8.8%：每月上限 1,000 點；約刷 NT$11,364 達加碼上限"
+              "精選通路最高 10%：每月上限 500 點；約刷 NT,555 達加碼上限",
+              "海外實體最高 5%：每月上限 500 點；約刷 NT,500 達加碼上限",
+              "國內一般 1%：無上限",
+              "國外一般 1%：無上限"
             ],
             "structured_rewards": [
               {
-                "code": "國內",
-                "label": "國內消費回饋",
-                "value": 1.2,
+                "code": "網購",
+                "label": "精選通路",
+                "value": 10,
                 "suffix": "%",
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享最高1.2% 現金積點回饋無上限",
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，生活玩家精選通路享最高10%回饋！加碼9%每戶每月上限500點",
+                "customer_scope": "regular_or_all"
+              },
+              {
+                "code": "海外實體",
+                "label": "海外實體消費",
+                "value": 5,
+                "suffix": "%",
+                "conditions": "於日、韓、泰、新、美、歐實體商店消費享最高5%現金積點！加碼4%每戶每月上限500點",
+                "customer_scope": "regular_or_all"
+              },
+              {
+                "code": "國內",
+                "label": "國內一般消費",
+                "value": 1,
+                "suffix": "%",
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，享國內一般消費1%無上限",
                 "customer_scope": "regular_or_all"
               },
               {
                 "code": "海外",
-                "label": "海外消費回饋",
-                "value": 2.5,
+                "label": "國外一般消費",
+                "value": 1,
                 "suffix": "%",
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享最高2.5% 現金積點回饋無上限",
-                "customer_scope": "regular_or_all"
-              },
-              {
-                "code": "網購",
-                "label": "網購消費回饋",
-                "value": 8.8,
-                "suffix": "%",
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月",
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，享國外一般消費1%無上限",
                 "customer_scope": "regular_or_all"
               }
             ]
           },
           "reward_limit_analysis": {
-            "as_of_date": "2026-06-15",
+            "as_of_date": "2026-07-01",
             "rules": [
               {
-                "benefit_name": "國內",
+                "benefit_name": "精選通路",
                 "reward_type": "points_or_cashback",
                 "customer_scope": "regular_or_all",
-                "headline_reward_rate_percent": 1.2,
-                "rate_used_for_cap_calculation_percent": 1.2,
-                "cap_status": "unlimited",
-                "reward_cap_amount": null,
-                "reward_cap_unit": null,
-                "cap_period": null,
-                "eligible_spend_to_reach_cap_twd": null,
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級國內一般消費享最高1.2% 現金積點回饋無上限",
-                "data_status": "icard_structured",
-                "source": {
-                  "title": "iCard 全部信用卡",
-                  "url": "https://icard.ai/home/all_cards",
-                  "retrieved_at": "2026-06-15"
-                }
-              },
-              {
-                "benefit_name": "海外",
-                "reward_type": "points_or_cashback",
-                "customer_scope": "regular_or_all",
-                "headline_reward_rate_percent": 2.5,
-                "rate_used_for_cap_calculation_percent": 2.5,
-                "cap_status": "unlimited",
-                "reward_cap_amount": null,
-                "reward_cap_unit": null,
-                "cap_period": null,
-                "eligible_spend_to_reach_cap_twd": null,
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級國外一般消費享最高2.5% 現金積點回饋無上限",
-                "data_status": "icard_structured",
-                "source": {
-                  "title": "iCard 全部信用卡",
-                  "url": "https://icard.ai/home/all_cards",
-                  "retrieved_at": "2026-06-15"
-                }
-              },
-              {
-                "benefit_name": "網購",
-                "reward_type": "points_or_cashback",
-                "customer_scope": "regular_or_all",
-                "headline_reward_rate_percent": 8.8,
-                "rate_used_for_cap_calculation_percent": 8.8,
+                "headline_reward_rate_percent": 10,
+                "rate_used_for_cap_calculation_percent": 10,
                 "cap_status": "capped",
-                "reward_cap_amount": 1000,
+                "reward_cap_amount": 500,
                 "reward_cap_unit": "points_or_twd",
                 "cap_period": "month",
-                "eligible_spend_to_reach_cap_twd": 11363.64,
-                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，升級最高10%*回饋！加碼回饋每戶上限1,000 點／月",
-                "data_status": "icard_structured",
+                "eligible_spend_to_reach_cap_twd": 5555.56,
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，生活玩家精選通路享最高10%回饋！加碼9%每戶每月上限500點",
+                "data_status": "official_updated",
                 "source": {
-                  "title": "iCard 全部信用卡",
-                  "url": "https://icard.ai/home/all_cards",
-                  "retrieved_at": "2026-06-15"
+                  "title": "星展銀行官方網站",
+                  "url": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html",
+                  "retrieved_at": "2026-08-07"
+                }
+              },
+              {
+                "benefit_name": "海外實體",
+                "reward_type": "points_or_cashback",
+                "customer_scope": "regular_or_all",
+                "headline_reward_rate_percent": 5,
+                "rate_used_for_cap_calculation_percent": 5,
+                "cap_status": "capped",
+                "reward_cap_amount": 500,
+                "reward_cap_unit": "points_or_twd",
+                "cap_period": "month",
+                "eligible_spend_to_reach_cap_twd": 12500,
+                "conditions": "於日本、韓國、泰國、新加坡、美洲、歐洲實體商店消費享最高5%現金積點！加碼4%每戶每月上限500點",
+                "data_status": "official_updated",
+                "source": {
+                  "title": "星展銀行官方網站",
+                  "url": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html",
+                  "retrieved_at": "2026-08-07"
+                }
+              },
+              {
+                "benefit_name": "國外一般",
+                "reward_type": "points_or_cashback",
+                "customer_scope": "regular_or_all",
+                "headline_reward_rate_percent": 1,
+                "rate_used_for_cap_calculation_percent": 1,
+                "cap_status": "unlimited",
+                "reward_cap_amount": null,
+                "reward_cap_unit": null,
+                "cap_period": null,
+                "eligible_spend_to_reach_cap_twd": null,
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，國外一般消費享1%現金積點回饋無上限",
+                "data_status": "official_updated",
+                "source": {
+                  "title": "星展銀行官方網站",
+                  "url": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html",
+                  "retrieved_at": "2026-08-07"
+                }
+              },
+              {
+                "benefit_name": "國內一般",
+                "reward_type": "points_or_cashback",
+                "customer_scope": "regular_or_all",
+                "headline_reward_rate_percent": 1,
+                "rate_used_for_cap_calculation_percent": 1,
+                "cap_status": "unlimited",
+                "reward_cap_amount": null,
+                "reward_cap_unit": null,
+                "cap_period": null,
+                "eligible_spend_to_reach_cap_twd": null,
+                "conditions": "以指定星展帳戶設定信用卡自動轉帳付款，國內一般消費享1%現金積點回饋無上限",
+                "data_status": "official_updated",
+                "source": {
+                  "title": "星展銀行官方網站",
+                  "url": "https://www.dbs.com.tw/personal/cards/credit-cards/arena-of-valor-card.html",
+                  "retrieved_at": "2026-08-07"
                 }
               }
             ]

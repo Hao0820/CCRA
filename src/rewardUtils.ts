@@ -13,29 +13,18 @@ export function getBestRewardScenarios(card: Card): RewardScenario[] {
   return scenarios.filter((scenario) => scenario.rate === highestRate);
 }
 
-export function getGroupedScenarios(scenarios: RewardScenario[]): { label: string; id: string; original: RewardScenario; rate: number; ids: string[] }[] {
-  const grouped = new Map<string, { label: string; id: string; original: RewardScenario; rate: number; ids: string[] }>();
-  for (const scenario of scenarios) {
-    const key = scenario.spendToCap !== undefined 
-      ? `cap-${scenario.spendToCap}` 
-      : `rate-${scenario.rate}`;
-      
-    if (grouped.has(key)) {
-      const existing = grouped.get(key)!;
-      if (scenario.rate > existing.rate) {
-        existing.id = scenario.id;
-        existing.original = scenario;
-        existing.rate = scenario.rate;
-      }
-      if (!existing.label.split('/').includes(scenario.label)) {
-        existing.label = `${existing.label}/${scenario.label}`;
-      }
-      existing.ids.push(scenario.id);
-    } else {
-      grouped.set(key, { label: scenario.label, id: scenario.id, original: scenario, rate: scenario.rate, ids: [scenario.id] });
+export function getGroupedScenarios(scenarios: RewardScenario[]): RewardScenario[] {
+  // Retain all individual distinct scenarios so the user can choose specific channels/modes
+  const seen = new Set<string>();
+  const list: RewardScenario[] = [];
+  for (const s of scenarios) {
+    const key = `${s.label}-${s.rate}-${s.limit ?? ''}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      list.push(s);
     }
   }
-  return Array.from(grouped.values());
+  return list.length > 0 ? list : scenarios;
 }
 
 export function getTransactionRewardRate(transaction: Transaction, card?: Card): number {
@@ -43,7 +32,7 @@ export function getTransactionRewardRate(transaction: Transaction, card?: Card):
   if (!card) return 0;
   const scenario = card.rewardScenarios?.find(
     (item) => item.id === transaction.rewardScenarioId,
-  );
+  ) || card.rewardScenarios?.[0];
   if (!scenario) return card.rewardRate;
 
   const TRIVIAL_CONDITIONS = ['當月有消費、不限金額', '需消費', '不限金額'];
@@ -56,18 +45,28 @@ export function getTransactionRewardRate(transaction: Transaction, card?: Card):
     let total = 0;
     if (hasExclusive) {
       // Base: all non-exclusive unlimited components
-      scenario.components.forEach((comp, i) => {
+      scenario.components.forEach((comp) => {
         if (!comp.exclusive && (comp.unlimited === true)) {
           total += comp.rate;
         }
       });
-      // Exclusive: find the selected one
+      // Exclusive: find the selected one or default to the highest exclusive rate
       const selectedExclusive = scenario.components.find((comp, i) => {
         if (!comp.exclusive) return false;
         const key = `${scenario.id}-comp-${i}`;
         return checkedKeys.includes(key);
       });
-      if (selectedExclusive) total += selectedExclusive.rate;
+
+      if (selectedExclusive) {
+        total += selectedExclusive.rate;
+      } else {
+        // If nothing explicitly checked yet, default to highest exclusive
+        const exclusiveComps = scenario.components.filter((c) => c.exclusive);
+        if (exclusiveComps.length > 0) {
+          const maxExclusive = Math.max(...exclusiveComps.map((c) => c.rate));
+          total += maxExclusive;
+        }
+      }
     } else {
       // Standard: last component is base, others need checkbox
       const isBase = (i: number) =>

@@ -93,6 +93,13 @@ const PERIOD_LABELS: Record<string, string> = {
 };
 
 function getRewardRate(card: CatalogCardSource): number {
+  if (card.reward_scenarios?.length) {
+    const scenarioRates = card.reward_scenarios
+      .map((item) => item.rate)
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+    if (scenarioRates.length > 0) return Math.max(...scenarioRates);
+  }
+
   const officialRates = (card.reward_limit_analysis?.rules ?? [])
     .flatMap((item) => [
       item.headline_reward_rate_percent,
@@ -205,7 +212,9 @@ function mapCatalog(source: CatalogSource): CreditCardCatalog {
         rewardLimitSummary: formatRewardLimit(card),
         rewardTargetSpend: getRewardTargetSpend(card),
         rewardRules: card.reward_limit_analysis?.rules ?? [],
-        rewardScenarios: card.reward_scenarios ?? [],
+        rewardScenarios: card.reward_scenarios
+          ? [...card.reward_scenarios].sort((a, b) => b.rate - a.rate)
+          : [],
         variants,
       };
     }),

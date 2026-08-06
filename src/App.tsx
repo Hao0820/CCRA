@@ -362,7 +362,7 @@ export default function App() {
                 merchant: transaction.merchant,
                 transaction_date: transaction.date,
                 amount: transaction.amount,
-                category: transaction.category,
+                category: transaction.category ?? 'other',
                 reward_scenario_id: transaction.rewardScenarioId ?? null,
                 reward_scenario_label: scenario?.label ?? null,
                 reward_rate: scenario?.rate ?? card?.rewardRate ?? 0,
