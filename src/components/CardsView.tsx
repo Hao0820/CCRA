@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Card, RewardScenario, Transaction } from '../types';
 import {
   CreditCardCatalogIssuer,
@@ -368,15 +369,16 @@ export default function CardsView({
       )}
 
       {/* Card Details Popup Modal */}
-      {selectedCard && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 pb-6 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
-          onClick={() => setSelectedCard(null)}
-        >
+      {selectedCard &&
+        createPortal(
           <div
-            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setSelectedCard(null)}
           >
+            <div
+              className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
             {/* Fixed Header */}
             <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
               <div className="flex items-center gap-2 min-w-0">
@@ -583,126 +585,132 @@ export default function CardsView({
               </button>
             </div>
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {selectedRewardScenario && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/70 backdrop-blur-sm"
-          onClick={() => setSelectedRewardScenario(null)}
-        >
+      {selectedRewardScenario &&
+        createPortal(
           <div
-            className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] bg-[#1c1c13]/70 backdrop-blur-sm"
+            onClick={() => setSelectedRewardScenario(null)}
           >
-            <div className="border-b border-dashed border-outline pb-3">
-              <p className="text-xs font-bold text-on-surface-variant">消費方式</p>
-              <div className="mt-1 flex items-center justify-between gap-3">
-                <h3 className="font-display text-xl font-bold text-primary">
-                  {selectedRewardScenario.label}
-                </h3>
-                <span className="rounded-full bg-[var(--accent-bg)] px-3 py-1 text-sm font-bold font-sans text-[var(--accent-text)]">
-                  {selectedRewardScenario.rate}%
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-4 text-left">
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant">回饋上限</p>
-                <p className="mt-1 rounded-md border border-[#846b12]/20 bg-[#fcf5c7]/60 p-3 text-sm leading-relaxed text-[#846b12]">
-                  {selectedRewardScenario.limit}
-                </p>
+            <div
+              className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="border-b border-dashed border-outline pb-3">
+                <p className="text-xs font-bold text-on-surface-variant">消費方式</p>
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <h3 className="font-display text-xl font-bold text-primary">
+                    {selectedRewardScenario.label}
+                  </h3>
+                  <span className="rounded-full bg-[var(--accent-bg)] px-3 py-1 text-sm font-bold font-sans text-[var(--accent-text)]">
+                    {selectedRewardScenario.rate}%
+                  </span>
+                </div>
               </div>
 
-              <div>
-                <p className="text-xs font-bold text-on-surface-variant">完整規則</p>
-                <p className="mt-1 whitespace-pre-line rounded-md border border-[#75777d]/20 bg-white/50 p-3 text-sm leading-relaxed text-on-surface">
-                  {selectedRewardScenario.rule}
-                </p>
-              </div>
-
-              {selectedRewardScenario.channels && selectedRewardScenario.channels.length > 0 && (
+              <div className="mt-4 space-y-4 text-left">
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant">適用通路</p>
-                  <p className="mt-1 text-xs leading-relaxed text-on-surface">
-                    {selectedRewardScenario.channels.join('、')}
+                  <p className="text-xs font-bold text-on-surface-variant">回饋上限</p>
+                  <p className="mt-1 rounded-md border border-[#846b12]/20 bg-[#fcf5c7]/60 p-3 text-sm leading-relaxed text-[#846b12]">
+                    {selectedRewardScenario.limit}
                   </p>
                 </div>
-              )}
 
-              {selectedRewardScenario.conditions && selectedRewardScenario.conditions.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant">適用條件</p>
-                  <p className="mt-1 text-xs leading-relaxed text-on-surface">
-                    {selectedRewardScenario.conditions.join('、')}
+                  <p className="text-xs font-bold text-on-surface-variant">完整規則</p>
+                  <p className="mt-1 whitespace-pre-line rounded-md border border-[#75777d]/20 bg-white/50 p-3 text-sm leading-relaxed text-on-surface">
+                    {selectedRewardScenario.rule}
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {cardPendingDelete && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/70 backdrop-blur-sm"
-          onClick={() => setCardPendingDelete(null)}
-        >
+                {selectedRewardScenario.channels && selectedRewardScenario.channels.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-on-surface-variant">適用通路</p>
+                    <p className="mt-1 text-xs leading-relaxed text-on-surface">
+                      {selectedRewardScenario.channels.join('、')}
+                    </p>
+                  </div>
+                )}
+
+                {selectedRewardScenario.conditions && selectedRewardScenario.conditions.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-on-surface-variant">適用條件</p>
+                    <p className="mt-1 text-xs leading-relaxed text-on-surface">
+                      {selectedRewardScenario.conditions.join('、')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {cardPendingDelete &&
+        createPortal(
           <div
-            className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] bg-[#1c1c13]/70 backdrop-blur-sm"
+            onClick={() => setCardPendingDelete(null)}
           >
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffdad6] sketch-border-sm">
-                <Trash2 size={20} className="text-[#ba1a1a]" />
+            <div
+              className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffdad6] sketch-border-sm">
+                  <Trash2 size={20} className="text-[#ba1a1a]" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-[#ba1a1a]">確定刪除信用卡？</h3>
+                  <p className="mt-2 text-sm font-bold text-on-surface">
+                    {cardPendingDelete.name}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">
+                    刪除後，與這張卡片相關的消費紀錄也會一併移除，此動作無法復原。
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-[#ba1a1a]">確定刪除信用卡？</h3>
-                <p className="mt-2 text-sm font-bold text-on-surface">
-                  {cardPendingDelete.name}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">
-                  刪除後，與這張卡片相關的消費紀錄也會一併移除，此動作無法復原。
-                </p>
-              </div>
-            </div>
 
-            <div className="mt-6 flex justify-end gap-2 border-t border-dashed border-[#75777d]/30 pt-4">
-              <button
-                type="button"
-                onClick={() => setCardPendingDelete(null)}
-                className="px-4 py-2 sketch-border-sm bg-white hover:bg-[#ece8d9] text-xs font-bold"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onDeleteCard(cardPendingDelete.id);
-                  setCardPendingDelete(null);
-                  setSelectedCard(null);
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 sketch-border-sm bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
-              >
-                <Trash2 size={14} />
-                確認刪除
-              </button>
+              <div className="mt-6 flex justify-end gap-2 border-t border-dashed border-[#75777d]/30 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setCardPendingDelete(null)}
+                  className="px-4 py-2 sketch-border-sm bg-white hover:bg-[#ece8d9] text-xs font-bold"
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onDeleteCard(cardPendingDelete.id);
+                    setCardPendingDelete(null);
+                    setSelectedCard(null);
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 sketch-border-sm bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
+                >
+                  <Trash2 size={14} />
+                  確認刪除
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
       {/* Add Card Dialog */}
-      {isAddingCard && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 pb-6 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
-          onClick={() => setIsAddingCard(false)}
-        >
+      {isAddingCard &&
+        createPortal(
           <div
-            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setIsAddingCard(false)}
           >
+            <div
+              className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
             {/* Fixed Header */}
             <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
               <h3 className="font-display text-lg font-bold text-primary">
@@ -884,7 +892,8 @@ export default function CardsView({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

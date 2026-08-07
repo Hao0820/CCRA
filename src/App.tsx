@@ -68,6 +68,7 @@ export default function App() {
   // Ledger configuration
   const [cashBalance, setCashBalance] = useState(0);
   const [accentColor, setAccentColor] = useState<AccentColor>('pink');
+  const accent = ACCENT_COLORS[accentColor];
   
   // Database States
   const [cards, setCards] = useState<Card[]>([]);
@@ -108,6 +109,11 @@ export default function App() {
       document.body.classList.remove('theme-comic');
     }
   }, [uiTheme]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent-bg', accent.background);
+    document.documentElement.style.setProperty('--accent-text', accent.text);
+  }, [accent]);
 
   useEffect(() => {
     [
@@ -523,7 +529,6 @@ export default function App() {
     return 'NT$';
   };
 
-  const accent = ACCENT_COLORS[accentColor];
   const handleLineLogin = () => {
     setAuthError('');
     const returnTo = `${window.location.origin}${window.location.pathname}`;
@@ -592,7 +597,7 @@ export default function App() {
     >
       
       {/* TopAppBar */}
-      <header className={`shrink-0 bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+      <header className={`shrink-0 pt-safe bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
         <div className="flex justify-between items-center w-full max-w-screen-md mx-auto">
           {/* Symmetrical Left Spacer to keep title centered */}
           <div className="w-9 h-9" />
