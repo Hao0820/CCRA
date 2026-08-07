@@ -31,6 +31,7 @@ interface ExpensesViewProps {
   initialCardId: string | null;
   onClearInitialCard: () => void;
   onUpdateCard?: (card: Card) => void;
+  uiTheme?: 'sketch' | 'comic';
 }
 
 const CARD_PALETTE = [
@@ -72,6 +73,7 @@ export default function ExpensesView({
   initialCardId,
   onClearInitialCard,
   onUpdateCard,
+  uiTheme = 'sketch',
 }: ExpensesViewProps) {
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -721,270 +723,287 @@ export default function ExpensesView({
       {/* Add Transaction Popup Modal */}
       {isAddingExpense && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-24 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 pb-6 bg-[#1c1c13]/60 backdrop-blur-sm animate-fade-in"
           onClick={handleCloseModal}
         >
           <div
-            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-sm max-h-[85vh] flex flex-col p-6 transform scale-100 transition-all duration-300 relative rotate-card-1"
+            className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-xl font-bold text-primary mb-4 border-b border-outline border-dashed pb-2 shrink-0">
-              {editingTransaction ? '修改消費紀錄' : '記錄新消費'}
-            </h3>
+            {/* Fixed Header */}
+            <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
+              <h3 className="font-display text-lg font-bold text-primary">
+                {editingTransaction ? '修改消費紀錄' : '記錄新消費'}
+              </h3>
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="text-on-surface-variant hover:text-on-surface p-1 text-base font-bold leading-none cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
 
-            <form onSubmit={handleCreateExpense} className="space-y-4 text-left overflow-y-auto pr-2 pb-2">
-              <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                  日期 *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-base font-sans cursor-pointer"
-                />
-              </div>
+            {/* Scrollable Form Body & Fixed Footer */}
+            <form onSubmit={handleCreateExpense} className="flex flex-col flex-1 min-h-0 text-left">
+              <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 text-left overscroll-contain">
+                {/* 2-column grid for Date and Amount */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                      日期 *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-sm cursor-pointer"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                  消費項目 *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="ex: 早餐, 衣服"
-                  value={merchant}
-                  onChange={(e) => setMerchant(e.target.value)}
-                  className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-base"
-                />
-              </div>
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                      交易金額 *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      placeholder="ex: 1000"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm font-sans"
+                    />
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                  交易金額 *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="ex: 1000"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-base font-sans"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                  扣款 *
-                </label>
-                <select
-                  required
-                  value={cardId}
-                  onChange={(e) => {
-                    const newId = e.target.value;
-                    setCardId(newId);
-                    const targetCard = cards.find(c => c.id === newId);
-                    setRewardScenarioId(targetCard?.rewardScenarios?.[0]?.id || '');
-                  }}
-                  className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-base cursor-pointer"
-                >
-                  <option value="cash">
-                    現金（餘額 {currencySymbol} {cashBalance.toLocaleString()}）
-                  </option>
-                  {sortedCards.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.isFavorite ? '♥ ' : ''}({c.bankCode}) {c.bankName} - {c.name} (...{c.lastFour})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {cardId !== 'cash' && rewardScenarios.length > 0 && (
                 <div>
                   <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                    消費方式 *
+                    消費項目 *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ex: 早餐, 衣服, 高鐵"
+                    value={merchant}
+                    onChange={(e) => setMerchant(e.target.value)}
+                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    扣款方式 *
                   </label>
                   <select
-                    value={activeScenarioId}
-                    onChange={(e) => setRewardScenarioId(e.target.value)}
-                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-base cursor-pointer"
+                    required
+                    value={cardId}
+                    onChange={(e) => {
+                      const newId = e.target.value;
+                      setCardId(newId);
+                      const targetCard = cards.find(c => c.id === newId);
+                      setRewardScenarioId(targetCard?.rewardScenarios?.[0]?.id || '');
+                    }}
+                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
                   >
-                    {rewardScenarios.map((scenario) => (
-                      <option key={scenario.id} value={scenario.id}>
-                        {scenario.label}（最高 {scenario.rate}%）
+                    <option value="cash">
+                      現金（餘額 {currencySymbol} {cashBalance.toLocaleString()}）
+                    </option>
+                    {sortedCards.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.isFavorite ? '♥ ' : ''}({c.bankCode}) {c.bankName} - {c.name} (...{c.lastFour})
                       </option>
                     ))}
                   </select>
-                  {(() => {
-                    if (!selectedScenario) return null;
-                    const card = cards.find(c => c.id === cardId);
-
-                    // Filter out trivial "just spend" conditions
-                    const TRIVIAL_CONDITIONS = [
-                      '當月有消費、不限金額',
-                      '需消費',
-                      '不限金額',
-                    ];
-                    const realConditions = (selectedScenario.conditions ?? []).filter(
-                      (c) => !TRIVIAL_CONDITIONS.includes(c.trim())
-                    );
-
-                    // Build a list of displayable rows combining components with conditions
-                    const components = selectedScenario.components ?? [];
-
-                    type Row = { key: string; label: string; rate: number };
-
-                    // Separate exclusive (radio), additive (checkbox), base (always counted)
-                    const exclusiveRows: Row[] = [];
-                    let additiveRows: Row[] = [];
-                    let baseRate = 0;
-
-                    if (components.length > 0) {
-                      // Check if any component is marked exclusive
-                      const hasExclusive = components.some((c) => c.exclusive);
-                      components.forEach((comp, i) => {
-                        const key = `${selectedScenario.id}-comp-${i}`;
-                        if (comp.exclusive) {
-                          exclusiveRows.push({ key, label: comp.description, rate: comp.rate });
-                        } else if (!hasExclusive && (comp.unlimited !== true && i !== components.length - 1)) {
-                          additiveRows.push({ key, label: comp.description, rate: comp.rate });
-                        } else if (comp.unlimited === true || (!hasExclusive && i === components.length - 1)) {
-                          baseRate += comp.rate;
-                        }
-                      });
-                    } else {
-                      // Condition-based (no components)
-                      additiveRows = realConditions.map((cond) => ({
-                        key: `${selectedScenario.id}-${cond}`,
-                        label: cond,
-                        rate: selectedScenario.rate,
-                      }));
-                    }
-
-                    const hasExclusiveRows = exclusiveRows.length > 0;
-                    const hasAdditiveRows = additiveRows.length > 0;
-                    const checkedKeys = card?.achievedConditions ?? [];
-
-                    // For exclusive: default to the first/highest exclusive row if none checked yet
-                    const foundExclusiveKey = exclusiveRows.map((r) => r.key).find((k) => checkedKeys.includes(k));
-                    const selectedExclusiveKey = foundExclusiveKey || exclusiveRows[0]?.key || null;
-                    const exclusiveRate = exclusiveRows.find((r) => r.key === selectedExclusiveKey)?.rate ?? 0;
-                    const additiveRate = additiveRows.reduce((sum, row) => checkedKeys.includes(row.key) ? sum + row.rate : sum, 0);
-                    const currentRate = baseRate + exclusiveRate + additiveRate;
-
-                    return (
-                      <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
-                        {selectedScenario.limit && (
-                          <div className="text-[#846b12]">
-                            <span className="font-bold">上限：</span>
-                            {selectedScenario.limit}
-                          </div>
-                        )}
-
-                        {/* Exclusive (radio) rows — mutually exclusive modes */}
-                        {hasExclusiveRows && card && onUpdateCard && (
-                          <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
-                            <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
-                              選擇回饋模式（擇一）：
-                            </p>
-                            {exclusiveRows.map((row, idx) => {
-                              const isSelected = selectedExclusiveKey === row.key;
-                              return (
-                                <label
-                                  key={row.key}
-                                  className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
-                                    idx < exclusiveRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
-                                  } ${isSelected ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
-                                >
-                                  <input
-                                    type="radio"
-                                    name={`exclusive-${selectedScenario.id}`}
-                                    className="w-4 h-4 accent-primary shrink-0 cursor-pointer"
-                                    checked={isSelected}
-                                    onChange={() => {
-                                      const current = (card.achievedConditions || []).filter(
-                                        (k) => !exclusiveRows.some((r) => r.key === k)
-                                      );
-                                      onUpdateCard({ ...card, achievedConditions: [...current, row.key] });
-                                    }}
-                                  />
-                                  <span className={`flex-1 text-xs leading-snug ${isSelected ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
-                                    {row.label}
-                                  </span>
-                                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold font-sans border ${
-                                    isSelected
-                                      ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-black/10'
-                                      : 'bg-white/60 text-on-surface-variant border-[#75777d]/20'
-                                  }`}>
-                                    +{row.rate}%
-                                  </span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {/* Additive (checkbox) rows */}
-                        {hasAdditiveRows && card && onUpdateCard && (
-                          <div className="mt-2 border border-[#75777d]/20 rounded-sm overflow-hidden">
-                            <p className="font-bold text-on-surface text-xs bg-[var(--color-surface-container-low)] px-2.5 py-1.5 border-b border-[#75777d]/20">
-                              勾選達成的加成條件：
-                            </p>
-                            {additiveRows.map((row, idx) => {
-                              const isChecked = checkedKeys.includes(row.key);
-                              return (
-                                <label
-                                  key={row.key}
-                                  className={`flex items-center gap-2 px-2.5 py-2 cursor-pointer transition-colors ${
-                                    idx < additiveRows.length - 1 ? 'border-b border-[#75777d]/10' : ''
-                                  } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[#75777d]/5'}`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="w-4 h-4 rounded-sm border-outline accent-primary shrink-0 cursor-pointer"
-                                    checked={isChecked}
-                                    onChange={() => {
-                                      const current = card.achievedConditions || [];
-                                      const newConditions = current.includes(row.key)
-                                        ? current.filter(c => c !== row.key)
-                                        : [...current, row.key];
-                                      onUpdateCard({ ...card, achievedConditions: newConditions });
-                                    }}
-                                  />
-                                  <span className={`flex-1 text-xs leading-snug ${isChecked ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
-                                    {row.label}
-                                  </span>
-                                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold font-sans border ${
-                                    isChecked
-                                      ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-black/10'
-                                      : 'bg-white/60 text-on-surface-variant border-[#75777d]/20'
-                                  }`}>
-                                    +{row.rate}%
-                                  </span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between mt-2 px-2.5 py-2 bg-[var(--accent-bg)] text-[var(--accent-text)] rounded-sm border border-black/10 shadow-sm">
-                          <span className="text-xs font-bold">預估回饋</span>
-                          <span className="text-base font-bold font-sans">{Math.round(currentRate * 100) / 100}%</span>
-                        </div>
-                      </div>
-                    );
-                  })()}
                 </div>
-              )}
 
-              <div className="flex justify-between items-center pt-2 border-t border-dashed border-[#75777d]/20 mt-4">
+                {cardId !== 'cash' && rewardScenarios.length > 0 && (
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                      消費方式 *
+                    </label>
+                    <select
+                      value={activeScenarioId}
+                      onChange={(e) => setRewardScenarioId(e.target.value)}
+                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
+                    >
+                      {rewardScenarios.map((scenario) => (
+                        <option key={scenario.id} value={scenario.id}>
+                          {scenario.label}（最高 {scenario.rate}%）
+                        </option>
+                      ))}
+                    </select>
+                    {(() => {
+                      if (!selectedScenario) return null;
+                      const card = cards.find(c => c.id === cardId);
+
+                      // Filter out trivial "just spend" conditions
+                      const TRIVIAL_CONDITIONS = [
+                        '當月有消費、不限金額',
+                        '需消費',
+                        '不限金額',
+                      ];
+                      const realConditions = (selectedScenario.conditions ?? []).filter(
+                        (c) => !TRIVIAL_CONDITIONS.includes(c.trim())
+                      );
+
+                      // Build a list of displayable rows combining components with conditions
+                      const components = selectedScenario.components ?? [];
+
+                      type Row = { key: string; label: string; rate: number };
+
+                      // Separate exclusive (radio), additive (checkbox), base (always counted)
+                      const exclusiveRows: Row[] = [];
+                      let additiveRows: Row[] = [];
+                      let baseRate = 0;
+
+                      if (components.length > 0) {
+                        // Check if any component is marked exclusive
+                        const hasExclusive = components.some((c) => c.exclusive);
+                        components.forEach((comp, i) => {
+                          const key = `${selectedScenario.id}-comp-${i}`;
+                          if (comp.exclusive) {
+                            exclusiveRows.push({ key, label: comp.description, rate: comp.rate });
+                          } else if (!hasExclusive && (comp.unlimited !== true && i !== components.length - 1)) {
+                            additiveRows.push({ key, label: comp.description, rate: comp.rate });
+                          } else if (comp.unlimited === true || (!hasExclusive && i === components.length - 1)) {
+                            baseRate += comp.rate;
+                          }
+                        });
+                      } else {
+                        // Condition-based (no components)
+                        additiveRows = realConditions.map((cond) => ({
+                          key: `${selectedScenario.id}-${cond}`,
+                          label: cond,
+                          rate: selectedScenario.rate,
+                        }));
+                      }
+
+                      const hasExclusiveRows = exclusiveRows.length > 0;
+                      const hasAdditiveRows = additiveRows.length > 0;
+                      const checkedKeys = card?.achievedConditions ?? [];
+
+                      // For exclusive: default to the first/highest exclusive row if none checked yet
+                      const foundExclusiveKey = exclusiveRows.map((r) => r.key).find((k) => checkedKeys.includes(k));
+                      const selectedExclusiveKey = foundExclusiveKey || exclusiveRows[0]?.key || null;
+                      const exclusiveRate = exclusiveRows.find((r) => r.key === selectedExclusiveKey)?.rate ?? 0;
+                      const additiveRate = additiveRows.reduce((sum, row) => checkedKeys.includes(row.key) ? sum + row.rate : sum, 0);
+                      const currentRate = baseRate + exclusiveRate + additiveRate;
+
+                      return (
+                        <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
+                          {selectedScenario.limit && (
+                            <div className={`text-[#846b12] bg-[var(--color-surface-container)] p-2 rounded-sm border ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/30 font-handwriting`}>
+                              <span className="font-bold text-on-surface">上限：</span>
+                              {selectedScenario.limit}
+                            </div>
+                          )}
+
+                          {/* Exclusive (radio) rows — mutually exclusive modes */}
+                          {hasExclusiveRows && card && onUpdateCard && (
+                            <div className="mt-2 sketch-border-sm rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
+                              <p className={`font-bold text-on-surface text-xs bg-[var(--color-surface-container)] px-2.5 py-1.5 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+                                選擇回饋模式（擇一）：
+                              </p>
+                              {exclusiveRows.map((row, idx) => {
+                                const isSelected = selectedExclusiveKey === row.key;
+                                return (
+                                  <label
+                                    key={row.key}
+                                    className={`flex items-center gap-2 px-2.5 py-1.5 cursor-pointer transition-colors ${
+                                      idx < exclusiveRows.length - 1 ? `border-b ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/20` : ''
+                                    } ${isSelected ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[var(--color-surface-container-high)]'}`}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={`exclusive-${selectedScenario.id}`}
+                                      className="w-3.5 h-3.5 accent-primary shrink-0 cursor-pointer"
+                                      checked={isSelected}
+                                      onChange={() => {
+                                        const current = (card.achievedConditions || []).filter(
+                                          (k) => !exclusiveRows.some((r) => r.key === k)
+                                        );
+                                        onUpdateCard({ ...card, achievedConditions: [...current, row.key] });
+                                      }}
+                                    />
+                                    <span className={`flex-1 text-xs font-handwriting leading-snug ${isSelected ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                      {row.label}
+                                    </span>
+                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-handwriting sketch-border-sm ${
+                                      isSelected
+                                        ? 'bg-[var(--accent-bg)] text-[var(--accent-text)]'
+                                        : 'bg-[var(--color-surface-bg)] text-on-surface-variant'
+                                    }`}>
+                                      +{row.rate}%
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Additive (checkbox) rows */}
+                          {hasAdditiveRows && card && onUpdateCard && (
+                            <div className="mt-2 sketch-border-sm rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
+                              <p className={`font-bold text-on-surface text-xs bg-[var(--color-surface-container)] px-2.5 py-1.5 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+                                勾選達成的加成條件：
+                              </p>
+                              {additiveRows.map((row, idx) => {
+                                const isChecked = checkedKeys.includes(row.key);
+                                return (
+                                  <label
+                                    key={row.key}
+                                    className={`flex items-center gap-2 px-2.5 py-1.5 cursor-pointer transition-colors ${
+                                      idx < additiveRows.length - 1 ? `border-b ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/20` : ''
+                                    } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[var(--color-surface-container-high)]'}`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      className="w-3.5 h-3.5 rounded-sm border-outline accent-primary shrink-0 cursor-pointer"
+                                      checked={isChecked}
+                                      onChange={() => {
+                                        const current = card.achievedConditions || [];
+                                        const newConditions = current.includes(row.key)
+                                          ? current.filter(c => c !== row.key)
+                                          : [...current, row.key];
+                                        onUpdateCard({ ...card, achievedConditions: newConditions });
+                                      }}
+                                    />
+                                    <span className={`flex-1 text-xs font-handwriting leading-snug ${isChecked ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                      {row.label}
+                                    </span>
+                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-handwriting sketch-border-sm ${
+                                      isChecked
+                                        ? 'bg-[var(--accent-bg)] text-[var(--accent-text)]'
+                                        : 'bg-[var(--color-surface-bg)] text-on-surface-variant'
+                                    }`}>
+                                      +{row.rate}%
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between mt-2 px-2.5 py-1.5 bg-[var(--accent-bg)] text-[var(--accent-text)] sketch-border-sm pencil-shadow">
+                            <span className="text-xs font-bold font-handwriting">預估回饋</span>
+                            <span className="text-sm font-bold font-handwriting">{Math.round(currentRate * 100) / 100}%</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Fixed Bottom Action Bar */}
+              <div className={`p-3 bg-[var(--color-surface-bg)] border-t-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 flex justify-between items-center gap-2`}>
                 {editingTransaction ? (
                   <button
                     type="button"
                     onClick={() => setTransactionPendingDelete(editingTransaction)}
-                    className="flex items-center gap-1.5 px-3 py-2 text-[#ba1a1a] hover:bg-[#ffdad6] rounded-sm text-xs font-bold transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 text-[#ba1a1a] bg-[#ffdad6]/60 hover:bg-[#ffdad6] active:scale-95 sketch-border-sm text-xs font-bold font-handwriting transition-colors cursor-pointer"
                   >
                     <Trash2 size={14} />
                     刪除
@@ -994,14 +1013,14 @@ export default function ExpensesView({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="px-4 py-2 sketch-border-sm hover:bg-[#ece8d9] text-xs font-bold cursor-pointer"
+                    className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-container-high)] text-on-surface hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting cursor-pointer"
                     onClick={handleCloseModal}
                   >
                     取消
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 text-xs font-bold pencil-shadow cursor-pointer"
+                    className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting pencil-shadow cursor-pointer"
                   >
                     {editingTransaction ? '確認修改' : '建立消費紀錄'}
                   </button>

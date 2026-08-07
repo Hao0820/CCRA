@@ -633,6 +633,7 @@ export default function App() {
             currencySymbol={getDisplayCurrencySymbol()}
             isAddingCard={isAddingCard}
             setIsAddingCard={setIsAddingCard}
+            uiTheme={uiTheme}
             onAddExpenseForCard={(cardId) => {
               setPreselectedExpenseCardId(cardId);
               setActiveTab('expense');
@@ -657,6 +658,7 @@ export default function App() {
             initialCardId={preselectedExpenseCardId}
             onClearInitialCard={() => setPreselectedExpenseCardId(null)}
             onUpdateCard={handleUpdateCard}
+            uiTheme={uiTheme}
           />
         )}
 
