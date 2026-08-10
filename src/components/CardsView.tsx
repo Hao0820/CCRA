@@ -254,9 +254,9 @@ export default function CardsView({
             setViewRewardScenarioId('');
           }
         }}
-        className={`sketch-border sketch-shadow cursor-pointer transition-all duration-300 bg-white/90 ${rotation} hover:scale-[1.02] flex items-center gap-3 p-3`}
+        className={`glass-panel  cursor-pointer transition-all duration-300 bg-[var(--bg-card)]/90 ${rotation} hover:scale-[1.02] flex items-center gap-3 p-3`}
       >
-        <div className="w-[110px] h-[70px] shrink-0 bg-[var(--color-surface-container-low)] rounded-md overflow-hidden flex items-center justify-center sketch-border-sm relative">
+        <div className="w-[110px] h-[70px] shrink-0 bg-[var(--bg-secondary)] rounded-md overflow-hidden flex items-center justify-center glass-panel relative">
           {card.cardImage ? (
             <img
               src={card.cardImage}
@@ -273,8 +273,8 @@ export default function CardsView({
 
         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
           <div className="flex justify-between items-start gap-1">
-            <p className="truncate text-[22px] font-bold text-primary font-display leading-tight">
-              {card.name} <span className="text-sm text-on-surface-variant font-sans font-normal ml-1">...{card.lastFour}</span>
+            <p className="truncate text-[22px] font-bold text-[var(--text-[var(--accent-primary)])] font-display leading-tight">
+              {card.name} <span className="text-sm text-[var(--text-secondary)] font-sans font-normal ml-1">...{card.lastFour}</span>
             </p>
             <button
               type="button"
@@ -285,14 +285,14 @@ export default function CardsView({
               className="shrink-0 p-1 rounded-full hover:bg-black/5 transition-colors active:scale-95"
             >
               {card.isFavorite ? (
-                <Heart size={20} fill="currentColor" className="text-[#ba1a1a]" />
+                <Heart size={20} fill="currentColor" className="text-[var(--accent-error)]" />
               ) : (
-                <Heart size={20} className="text-on-surface-variant" />
+                <Heart size={20} className="text-[var(--text-secondary)]" />
               )}
             </button>
           </div>
 
-          <div className="flex items-center gap-1 text-base text-on-surface-variant font-bold">
+          <div className="flex items-center gap-1 text-base text-[var(--text-secondary)] font-bold">
             <Coins size={16} className="opacity-75 shrink-0" />
             <span className="truncate font-sans">
               {card.currency} {spend.toLocaleString()}
@@ -308,7 +308,7 @@ export default function CardsView({
                     key={i}
                     className={`rounded-full border border-black/10 px-2 py-0.5 text-xs font-bold font-sans ${
                       remaining === 0
-                        ? 'bg-[#c3ecd7] text-[#294e3f]'
+                        ? 'bg-[var(--accent-success)] text-white text-[#294e3f]'
                         : 'bg-[#fcf5c7] text-[#846b12]'
                     }`}
                   >
@@ -327,16 +327,16 @@ export default function CardsView({
 
 
   return (
-    <div className="space-y-8 font-handwriting">
+    <div className="space-y-8 font-sans">
       {cards.length === 0 ? (
-        <div className="text-center py-12 bg-white/40 sketch-border border-dashed p-6">
-          <p className="text-on-surface-variant font-bold text-lg mb-2">這裡還沒有卡片！</p>
-          <p className="text-on-surface-variant text-sm">點選右上角的新增卡片來記錄您的第一張信用卡吧。</p>
+        <div className="text-center py-12 glass-panel border-dashed p-6 rounded-xl shadow-[var(--shadow-glow)] border-[var(--border-glow)]">
+          <p className="text-[var(--text-secondary)] font-bold text-lg mb-2">這裡還沒有卡片！</p>
+          <p className="text-[var(--text-secondary)] text-sm">點選右上角的新增卡片來記錄您的第一張信用卡吧。</p>
         </div>
       ) : (
         <>
           <section className="space-y-3">
-            <h3 className="font-display text-body-lg font-bold text-[#ba1a1a] transform -rotate-0.5 inline-flex items-center gap-1.5 bg-[#ffdad6] px-3 py-1 sketch-border-sm">
+            <h3 className="font-display text-body-lg font-bold text-[var(--accent-error)] transform -rotate-0.5 inline-flex items-center gap-1.5 bg-[var(--accent-error)]/20 text-[var(--accent-error)] px-3 py-1 glass-panel">
               <Heart size={16} fill="currentColor" />
               我的最愛
             </h3>
@@ -345,7 +345,7 @@ export default function CardsView({
                 {favoriteCards.map((card, index) => renderCardItem(card, index))}
               </div>
             ) : (
-              <div className="rounded-lg border border-dashed border-[#ba1a1a]/30 bg-[#ffdad6]/20 px-4 py-3 text-center text-xs text-on-surface-variant">
+              <div className="rounded-lg border border-dashed border-[var(--accent-error)]/30 bg-[var(--accent-error)]/10 px-4 py-3 text-center text-xs text-[var(--text-secondary)]">
                 點選信用卡查看詳情，再按空心愛心＋加入我的最愛。
               </div>
             )}
@@ -354,7 +354,7 @@ export default function CardsView({
 
           {Object.entries(bankGroups).map(([bankKey, group], groupIndex) => (
           <section key={bankKey} className="space-y-3">
-            <h3 className="font-display text-body-lg font-bold text-on-surface transform rotate-0.5 inline-block bg-surface-container-high px-3 py-1 sketch-border-sm">
+            <h3 className="font-display text-body-lg font-bold text-[var(--text-[var(--accent-primary)])] transform rotate-0.5 inline-block glass-panel-high px-3 py-1 glass-panel">
               {bankKey}
             </h3>
 
@@ -376,16 +376,16 @@ export default function CardsView({
             onClick={() => setSelectedCard(null)}
           >
             <div
-              className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
+              className="glass-panel border-[var(--border-glow)] shadow-[var(--shadow-glow)] w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
             {/* Fixed Header */}
-            <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
+            <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-[var(--border-color)]  shrink-0 bg-black/10`}>
               <div className="flex items-center gap-2 min-w-0">
-                <h3 className="font-display text-lg font-bold text-primary truncate">
+                <h3 className="font-display text-lg font-bold text-[var(--text-[var(--accent-primary)])] truncate">
                   卡片詳細資訊
                 </h3>
-                <span className="text-[11px] font-bold font-handwriting bg-[var(--color-surface-container-high)] text-on-surface-variant px-2 py-0.5 rounded-full shrink-0 sketch-border-sm">
+                <span className="text-[11px] font-bold font-sans bg-[var(--bg-card-hover)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full shrink-0 glass-panel">
                   {selectedCard.bankCode} {selectedCard.bankName}
                 </span>
               </div>
@@ -397,10 +397,10 @@ export default function CardsView({
                     onUpdateCard(updatedCard);
                     setSelectedCard(updatedCard);
                   }}
-                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold font-handwriting transition-colors cursor-pointer sketch-border-sm ${
+                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold font-sans transition-colors cursor-pointer glass-panel ${
                     selectedCard.isFavorite
-                      ? 'bg-[#ffdad6] text-[#ba1a1a]'
-                      : 'bg-[var(--color-surface-bg)] text-on-surface-variant'
+                      ? 'bg-[var(--accent-error)]/20 text-[var(--accent-error)] text-[var(--accent-error)]'
+                      : 'bg-[var(--bg-primary)] text-[var(--text-secondary)]'
                   }`}
                   title={selectedCard.isFavorite ? '取消我的最愛' : '加入我的最愛'}
                 >
@@ -414,7 +414,7 @@ export default function CardsView({
 
                 <button
                   type="button"
-                  className="flex items-center gap-1 px-2 py-1 sketch-border-sm text-[#ba1a1a] bg-[#ffdad6]/60 hover:bg-[#ffdad6] active:scale-95 transition-all text-[11px] font-bold font-handwriting cursor-pointer"
+                  className="flex items-center gap-1 px-2 py-1 glass-panel text-[var(--accent-error)] bg-[var(--accent-error)]/20 hover:bg-[var(--accent-error)]/20 text-[var(--accent-error)] active:scale-95 transition-all text-[11px] font-bold font-sans cursor-pointer"
                   onClick={() => setCardPendingDelete(selectedCard)}
                   title="刪除卡片"
                 >
@@ -425,7 +425,7 @@ export default function CardsView({
                 <button
                   type="button"
                   onClick={() => setSelectedCard(null)}
-                  className="text-on-surface-variant hover:text-on-surface p-1 text-base font-bold leading-none cursor-pointer ml-1"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-[var(--accent-primary)])] p-1 text-base font-bold leading-none cursor-pointer ml-1"
                 >
                   ✕
                 </button>
@@ -436,11 +436,11 @@ export default function CardsView({
             <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 text-left overscroll-contain">
               {/* Card Name & Badges */}
               <div>
-                <p className="text-base font-bold text-primary font-display">
+                <p className="text-base font-bold text-[var(--text-[var(--accent-primary)])] font-display">
                   {selectedCard.name}
                 </p>
                 {(selectedCard.cardNetworks?.length || selectedCard.cardLevel) && (
-                  <p className="text-[10px] text-on-surface-variant font-bold mt-0.5">
+                  <p className="text-[10px] text-[var(--text-secondary)] font-bold mt-0.5">
                     {[selectedCard.cardNetworks?.join(' / '), selectedCard.cardLevel]
                       .filter(Boolean)
                       .join(' · ')}
@@ -450,27 +450,27 @@ export default function CardsView({
 
               {/* 4 Metrics Grid (2x2) */}
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-[var(--color-surface-container-low)] sketch-border-sm p-2">
-                  <p className="text-[10px] font-bold text-on-surface-variant">末四碼</p>
-                  <p className="text-sm font-handwriting font-bold text-on-surface mt-0.5">
+                <div className="bg-[var(--bg-secondary)] glass-panel p-2">
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)]">末四碼</p>
+                  <p className="text-sm font-sans font-bold text-[var(--text-[var(--accent-primary)])] mt-0.5">
                     •••• {selectedCard.lastFour || 'XXXX'}
                   </p>
                 </div>
-                <div className="bg-[var(--color-surface-container-low)] sketch-border-sm p-2">
-                  <p className="text-[10px] font-bold text-on-surface-variant">額度</p>
-                  <p className="text-sm font-handwriting font-bold text-on-surface mt-0.5">
+                <div className="bg-[var(--bg-secondary)] glass-panel p-2">
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)]">額度</p>
+                  <p className="text-sm font-sans font-bold text-[var(--text-[var(--accent-primary)])] mt-0.5">
                     {selectedCard.currency} {(selectedCard.creditLimit ?? 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-[var(--color-surface-container-high)] sketch-border-sm p-2">
-                  <p className="text-[10px] font-bold text-on-surface-variant">本月累積消費</p>
-                  <p className="text-sm font-bold font-handwriting text-primary mt-0.5">
+                <div className="bg-[var(--bg-card-hover)] glass-panel p-2">
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)]">本月累積消費</p>
+                  <p className="text-sm font-bold font-sans text-[var(--text-[var(--accent-primary)])] mt-0.5">
                     {selectedCard.currency} {getCurrentMonthSpend(selectedCard.id).toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-[var(--accent-bg)]/30 sketch-border-sm p-2">
-                  <p className="text-[10px] font-bold text-on-surface-variant">本月累積回饋</p>
-                  <p className="flex items-center gap-1 text-sm font-bold font-handwriting text-secondary mt-0.5">
+                <div className="bg-[var(--accent-primary)]/30 glass-panel p-2">
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)]">本月累積回饋</p>
+                  <p className="flex items-center gap-1 text-sm font-bold font-sans text-[var(--text-secondary)] mt-0.5">
                     <Coins size={13} />
                     {getCardRewards(selectedCard).toLocaleString()} 點
                   </p>
@@ -480,13 +480,13 @@ export default function CardsView({
               {/* Reward Scenarios Section */}
               {selectedCard.rewardScenarios && selectedCard.rewardScenarios.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
                     消費方式與回饋規則
                   </p>
                   <select
                     value={viewRewardScenarioId}
                     onChange={(e) => setViewRewardScenarioId(e.target.value)}
-                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-xs font-bold mb-2 cursor-pointer"
+                    className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent font-sans py-1 text-xs font-bold mb-2 cursor-pointer"
                   >
                     {selectedCard.rewardScenarios.map((scenario) => (
                       <option key={scenario.id} value={scenario.id}>
@@ -503,30 +503,30 @@ export default function CardsView({
                       (c) => !TRIVIAL_CONDITIONS.includes(c.trim())
                     );
                     return (
-                      <div className="bg-[var(--color-surface-container-low)] sketch-border-sm p-2.5 text-left space-y-2">
+                      <div className="bg-[var(--bg-secondary)] glass-panel p-2.5 text-left space-y-2">
                         <div className="flex items-center justify-between gap-2 text-xs font-bold">
-                          <span className="font-handwriting">{scenario.label}</span>
-                          <span className="text-secondary font-handwriting text-sm">{scenario.rate}%</span>
+                          <span className="font-sans">{scenario.label}</span>
+                          <span className="text-[var(--text-secondary)] font-sans text-sm">{scenario.rate}%</span>
                         </div>
                         {scenario.components && scenario.components.length > 0 && (
-                          <div className={`space-y-1 border-t ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/30 pt-1.5`}>
+                          <div className={`space-y-1 border-t  border-[var(--border-color)]/30 pt-1.5`}>
                             {scenario.components.map((comp, idx) => (
                               <div key={idx} className="flex justify-between items-start text-[11px]">
-                                <span className="text-on-surface flex-1 font-handwriting">├─ {comp.description}</span>
-                                <span className="text-primary font-bold font-handwriting whitespace-nowrap ml-2">+{comp.rate}%</span>
+                                <span className="text-[var(--text-[var(--accent-primary)])] flex-1 font-sans">├─ {comp.description}</span>
+                                <span className="text-[var(--text-[var(--accent-primary)])] font-bold font-sans whitespace-nowrap ml-2">+{comp.rate}%</span>
                               </div>
                             ))}
                           </div>
                         )}
                         {scenario.limit && (
-                          <div className={`text-[11px] text-[#846b12] bg-[var(--color-surface-container)] p-2 rounded-sm border ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/30`}>
-                            <span className="font-bold text-on-surface">回饋上限：</span>{scenario.limit}
+                          <div className={`text-[11px] text-[#846b12] bg-[var(--bg-card)] p-2 rounded-sm border  border-[var(--border-color)]/30`}>
+                            <span className="font-bold text-[var(--text-[var(--accent-primary)])]">回饋上限：</span>{scenario.limit}
                           </div>
                         )}
                         {realConditions.length > 0 && (
-                          <div className="bg-[var(--color-surface-container)] p-2 rounded-sm space-y-1 text-[11px] text-on-surface-variant">
-                            <p className="font-bold text-on-surface text-xs">需達成條件：</p>
-                            <ul className="list-disc pl-4 space-y-0.5 font-handwriting">
+                          <div className="bg-[var(--bg-card)] p-2 rounded-sm space-y-1 text-[11px] text-[var(--text-secondary)]">
+                            <p className="font-bold text-[var(--text-[var(--accent-primary)])] text-xs">需達成條件：</p>
+                            <ul className="list-disc pl-4 space-y-0.5 font-sans">
                               {realConditions.map((cond, idx) => (
                                 <li key={idx} className="leading-tight">{cond}</li>
                               ))}
@@ -541,12 +541,12 @@ export default function CardsView({
 
               {(!selectedCard.rewardScenarios || selectedCard.rewardScenarios.length === 0) && (
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
                     回饋規則 (Reward Details)
                   </p>
-                  <div className="text-xs text-on-surface flex items-start gap-2 bg-[var(--color-surface-container)] p-2.5 sketch-border-sm">
-                    <Award size={16} className="text-secondary mt-0.5 shrink-0" />
-                    <span className="font-handwriting">{selectedCard.rewardDesc}</span>
+                  <div className="text-xs text-[var(--text-[var(--accent-primary)])] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 glass-panel">
+                    <Award size={16} className="text-[var(--text-secondary)] mt-0.5 shrink-0" />
+                    <span className="font-sans">{selectedCard.rewardDesc}</span>
                   </div>
                 </div>
               )}
@@ -554,22 +554,22 @@ export default function CardsView({
               {selectedCard.rewardLimitSummary &&
                 (!selectedCard.rewardScenarios || selectedCard.rewardScenarios.length === 0) && (
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
                     回饋上限與達檻消費
                   </p>
-                  <div className={`text-xs text-[#846b12] flex items-start gap-2 bg-[var(--color-surface-container)] p-2.5 sketch-border-sm`}>
+                  <div className={`text-xs text-[#846b12] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 glass-panel`}>
                     <Database size={16} className="text-[#846b12] mt-0.5 shrink-0" />
-                    <span className="font-handwriting">{selectedCard.rewardLimitSummary}</span>
+                    <span className="font-sans">{selectedCard.rewardLimitSummary}</span>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Fixed Bottom Action Bar */}
-            <div className={`p-3 bg-[var(--color-surface-bg)] border-t-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 grid grid-cols-[1fr_auto] items-center gap-2`}>
+            <div className={`p-3 bg-[var(--bg-primary)] border-t-2 border-[var(--border-color)]  shrink-0 grid grid-cols-[1fr_auto] items-center gap-2`}>
               <button
                 type="button"
-                className="flex items-center justify-center gap-1.5 px-4 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 active:scale-95 transition-all text-xs font-bold font-handwriting pencil-shadow cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-4 py-2 glass-panel  bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/25  hover:brightness-95 active:scale-95 transition-all text-xs font-bold font-sans  cursor-pointer"
                 onClick={() => onAddExpenseForCard(selectedCard.id)}
               >
                 <Plus size={14} />
@@ -578,10 +578,10 @@ export default function CardsView({
 
               <button
                 type="button"
-                className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-container-high)] text-on-surface hover:brightness-95 active:scale-95 transition-all text-xs font-bold font-handwriting pencil-shadow cursor-pointer"
+                className="px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] active:scale-95 transition-all text-sm font-bold font-sans cursor-pointer"
                 onClick={() => setSelectedCard(null)}
               >
-                知道了 (Got it)
+                知道了
               </button>
             </div>
           </div>
@@ -596,16 +596,16 @@ export default function CardsView({
             onClick={() => setSelectedRewardScenario(null)}
           >
             <div
-              className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+              className="relative w-full max-w-sm max-h-[78vh] overflow-y-auto glass-panel p-6 -rotate-[0.5deg] shadow-[var(--shadow-glow)] border-[var(--border-glow)]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="border-b border-dashed border-outline pb-3">
-                <p className="text-xs font-bold text-on-surface-variant">消費方式</p>
+              <div className="border-b border-dashed border-[var(--border-color)] pb-3">
+                <p className="text-xs font-bold text-[var(--text-secondary)]">消費方式</p>
                 <div className="mt-1 flex items-center justify-between gap-3">
-                  <h3 className="font-display text-xl font-bold text-primary">
+                  <h3 className="font-display text-xl font-bold text-[var(--text-[var(--accent-primary)])]">
                     {selectedRewardScenario.label}
                   </h3>
-                  <span className="rounded-full bg-[var(--accent-bg)] px-3 py-1 text-sm font-bold font-sans text-[var(--accent-text)]">
+                  <span className="rounded-full bg-[var(--accent-primary)] px-3 py-1 text-sm font-bold font-sans text-white">
                     {selectedRewardScenario.rate}%
                   </span>
                 </div>
@@ -613,23 +613,23 @@ export default function CardsView({
 
               <div className="mt-4 space-y-4 text-left">
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant">回饋上限</p>
+                  <p className="text-xs font-bold text-[var(--text-secondary)]">回饋上限</p>
                   <p className="mt-1 rounded-md border border-[#846b12]/20 bg-[#fcf5c7]/60 p-3 text-sm leading-relaxed text-[#846b12]">
                     {selectedRewardScenario.limit}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant">完整規則</p>
-                  <p className="mt-1 whitespace-pre-line rounded-md border border-[#75777d]/20 bg-white/50 p-3 text-sm leading-relaxed text-on-surface">
+                  <p className="text-xs font-bold text-[var(--text-secondary)]">完整規則</p>
+                  <p className="mt-1 whitespace-pre-line rounded-md border border-[#75777d]/20 bg-[var(--bg-card)]/50 p-3 text-sm leading-relaxed text-[var(--text-[var(--accent-primary)])]">
                     {selectedRewardScenario.rule}
                   </p>
                 </div>
 
                 {selectedRewardScenario.channels && selectedRewardScenario.channels.length > 0 && (
                   <div>
-                    <p className="text-xs font-bold text-on-surface-variant">適用通路</p>
-                    <p className="mt-1 text-xs leading-relaxed text-on-surface">
+                    <p className="text-xs font-bold text-[var(--text-secondary)]">適用通路</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[var(--text-[var(--accent-primary)])]">
                       {selectedRewardScenario.channels.join('、')}
                     </p>
                   </div>
@@ -637,8 +637,8 @@ export default function CardsView({
 
                 {selectedRewardScenario.conditions && selectedRewardScenario.conditions.length > 0 && (
                   <div>
-                    <p className="text-xs font-bold text-on-surface-variant">適用條件</p>
-                    <p className="mt-1 text-xs leading-relaxed text-on-surface">
+                    <p className="text-xs font-bold text-[var(--text-secondary)]">適用條件</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[var(--text-[var(--accent-primary)])]">
                       {selectedRewardScenario.conditions.join('、')}
                     </p>
                   </div>
@@ -656,19 +656,19 @@ export default function CardsView({
             onClick={() => setCardPendingDelete(null)}
           >
             <div
-              className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+              className="w-full max-w-sm glass-panel p-6 -rotate-[0.5deg] shadow-[var(--shadow-glow)] border-[var(--border-glow)]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffdad6] sketch-border-sm">
-                  <Trash2 size={20} className="text-[#ba1a1a]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-error)]/20 text-[var(--accent-error)] glass-panel">
+                  <Trash2 size={20} className="text-[var(--accent-error)]" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-bold text-[#ba1a1a]">確定刪除信用卡？</h3>
-                  <p className="mt-2 text-sm font-bold text-on-surface">
+                  <h3 className="font-display text-lg font-bold text-[var(--accent-error)]">確定刪除信用卡？</h3>
+                  <p className="mt-2 text-sm font-bold text-[var(--text-[var(--accent-primary)])]">
                     {cardPendingDelete.name}
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
                     刪除後，與這張卡片相關的消費紀錄也會一併移除，此動作無法復原。
                   </p>
                 </div>
@@ -678,7 +678,7 @@ export default function CardsView({
                 <button
                   type="button"
                   onClick={() => setCardPendingDelete(null)}
-                  className="px-4 py-2 sketch-border-sm bg-white hover:bg-[#ece8d9] text-xs font-bold"
+                  className="px-4 py-2 glass-panel bg-[var(--bg-card)] hover:bg-[#ece8d9] text-xs font-bold"
                 >
                   取消
                 </button>
@@ -689,7 +689,7 @@ export default function CardsView({
                     setCardPendingDelete(null);
                     setSelectedCard(null);
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 sketch-border-sm bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
+                  className="flex items-center gap-1.5 px-4 py-2 glass-panel bg-[var(--accent-error)]/20 text-[var(--accent-error)] text-[var(--accent-error)] hover:bg-[#ffb4ab] text-xs font-bold "
                 >
                   <Trash2 size={14} />
                   確認刪除
@@ -708,18 +708,18 @@ export default function CardsView({
             onClick={() => setIsAddingCard(false)}
           >
             <div
-              className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
+              className="glass-panel border-[var(--border-glow)] shadow-[var(--shadow-glow)] w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
             {/* Fixed Header */}
-            <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
-              <h3 className="font-display text-lg font-bold text-primary">
+            <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-[var(--border-color)]  shrink-0 bg-black/10`}>
+              <h3 className="font-display text-lg font-bold text-[var(--text-[var(--accent-primary)])]">
                 新增信用卡
               </h3>
               <button
                 type="button"
                 onClick={() => setIsAddingCard(false)}
-                className="text-on-surface-variant hover:text-on-surface p-1 text-base font-bold leading-none cursor-pointer"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-[var(--accent-primary)])] p-1 text-base font-bold leading-none cursor-pointer"
               >
                 ✕
               </button>
@@ -728,14 +728,14 @@ export default function CardsView({
             {/* Scrollable Form Body & Fixed Footer */}
             <form onSubmit={handleCreateCard} className="flex flex-col flex-1 min-h-0 text-left">
               <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 text-left overscroll-contain">
-                <div className={`rounded-lg border ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/30 bg-[var(--color-surface-container)] p-2.5 text-xs text-on-surface-variant flex items-start gap-2`}>
-                  <Database size={15} className="text-primary shrink-0 mt-0.5" />
-                  <span className="font-handwriting">選擇銀行與卡片後，系統會自動帶入回饋率、上限與卡面。</span>
+                <div className={`rounded-lg border  border-[var(--border-color)]/30 bg-[var(--bg-card)] p-2.5 text-xs text-[var(--text-secondary)] flex items-start gap-2`}>
+                  <Database size={15} className="text-[var(--text-[var(--accent-primary)])] shrink-0 mt-0.5" />
+                  <span className="font-sans">選擇銀行與卡片後，系統會自動帶入回饋率、上限與卡面。</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       發卡銀行 *
                     </label>
                     <select
@@ -746,7 +746,7 @@ export default function CardsView({
                         setCatalogCardId('');
                         setCatalogVariantId('');
                       }}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
+                      className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent font-sans py-1.5 text-sm cursor-pointer"
                     >
                       <option value="">請選擇銀行</option>
                       {catalogIssuers.map((issuer) => (
@@ -758,7 +758,7 @@ export default function CardsView({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       信用卡 *
                     </label>
                     <select
@@ -770,7 +770,7 @@ export default function CardsView({
                         setCatalogCardId(e.target.value);
                         setCatalogVariantId(nextCard?.variants[0]?.id ?? '');
                       }}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm disabled:opacity-50 cursor-pointer"
+                      className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent font-sans py-1.5 text-sm disabled:opacity-50 cursor-pointer"
                     >
                       <option value="">{issuerName ? '請選擇信用卡' : '請先選銀行'}</option>
                       {availableCards.map((card) => (
@@ -784,14 +784,14 @@ export default function CardsView({
 
                 {selectedCatalogCard && selectedCatalogCard.variants.length > 1 && (
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       卡片版本 *
                     </label>
                     <select
                       required
                       value={selectedCatalogVariant?.id ?? ''}
                       onChange={(e) => setCatalogVariantId(e.target.value)}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
+                      className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent font-sans py-1.5 text-sm cursor-pointer"
                     >
                       {selectedCatalogCard.variants.map((variant) => (
                         <option key={variant.id} value={variant.id}>
@@ -805,7 +805,7 @@ export default function CardsView({
                 )}
 
                 {selectedCatalogCard && (
-                  <div className="grid grid-cols-[72px_1fr] gap-2.5 bg-[var(--color-surface-container-low)] sketch-border-sm p-2.5 items-center">
+                  <div className="grid grid-cols-[72px_1fr] gap-2.5 bg-[var(--bg-secondary)] glass-panel p-2.5 items-center">
                     <div className="flex items-center justify-center">
                       {(selectedCatalogVariant?.imageUrl ?? selectedCatalogCard.imageUrl) ? (
                         <img
@@ -818,23 +818,23 @@ export default function CardsView({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-xs text-primary font-display truncate">{selectedCatalogCard.cardName}</p>
+                      <p className="font-bold text-xs text-[var(--text-[var(--accent-primary)])] font-display truncate">{selectedCatalogCard.cardName}</p>
                       {(selectedCatalogVariant?.cardNetworks.length || selectedCatalogVariant?.cardLevel) && (
-                        <p className="text-[10px] font-bold text-on-surface-variant mt-0.5">
+                        <p className="text-[10px] font-bold text-[var(--text-secondary)] mt-0.5">
                           {[selectedCatalogVariant.cardNetworks.join(' / '), selectedCatalogVariant.cardLevel]
                             .filter(Boolean)
                             .join(' · ')}
                         </p>
                       )}
-                      <p className="text-[11px] text-on-surface font-handwriting line-clamp-1 mt-0.5">{selectedCatalogCard.rewardDescription}</p>
-                      <p className="text-[11px] text-[#846b12] font-handwriting line-clamp-1">{selectedCatalogCard.rewardLimitSummary}</p>
+                      <p className="text-[11px] text-[var(--text-[var(--accent-primary)])] font-sans line-clamp-1 mt-0.5">{selectedCatalogCard.rewardDescription}</p>
+                      <p className="text-[11px] text-[#846b12] font-sans line-clamp-1">{selectedCatalogCard.rewardLimitSummary}</p>
                     </div>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       卡號末四碼 *
                     </label>
                     <input
@@ -845,12 +845,12 @@ export default function CardsView({
                       placeholder="ex: 5678"
                       value={lastFour}
                       onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ''))}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm"
+                      className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent placeholder-neutral-500 font-sans py-1 text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       額度 *
                     </label>
                     <input
@@ -862,30 +862,30 @@ export default function CardsView({
                       value={creditLimit}
                       onChange={(e) => setCreditLimit(e.target.value)}
                       readOnly={existingBankLimit > 0}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm read-only:opacity-60"
+                      className="w-full border-b-2 border-[var(--border-color)] focus:border-[var(--text-[var(--accent-primary)])] focus:outline-none bg-transparent placeholder-neutral-500 font-sans py-1 text-sm read-only:opacity-60"
                     />
                   </div>
                 </div>
 
                 {existingBankLimit > 0 && (
-                  <p className="text-[10px] text-on-surface-variant font-handwriting">
+                  <p className="text-[10px] text-[var(--text-secondary)] font-sans">
                     已沿用 {selectedCatalogCard?.bankName} 的共用額度。
                   </p>
                 )}
               </div>
 
               {/* Fixed Bottom Action Bar */}
-              <div className={`p-3 bg-[var(--color-surface-bg)] border-t-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 flex justify-end gap-2`}>
+              <div className={`p-3 bg-[var(--bg-primary)] border-t-2 border-[var(--border-color)]  shrink-0 flex justify-end gap-2`}>
                 <button
                   type="button"
-                  className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-container-high)] text-on-surface hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting cursor-pointer"
+                  className="px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] active:scale-95 transition-all text-sm font-bold font-sans cursor-pointer"
                   onClick={() => setIsAddingCard(false)}
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting pencil-shadow cursor-pointer"
+                  className="px-6 py-2 glass-panel  bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/25  hover:brightness-95 active:scale-95 text-xs font-bold font-sans  cursor-pointer"
                 >
                   確認新增
                 </button>

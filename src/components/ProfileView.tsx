@@ -4,8 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { AccentColor, Card, Transaction } from '../types';
-import { ACCENT_COLORS } from '../theme';
+import { Card, Transaction } from '../types';
 import {
   Banknote,
   CreditCard,
@@ -13,6 +12,8 @@ import {
   Palette,
   RefreshCw,
   User,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { calculateTransactionReward } from '../rewardUtils';
 
@@ -22,8 +23,6 @@ interface ProfileViewProps {
   currencySymbol: string;
   cashBalance: number;
   onUpdateCashBalance: (amount: number) => void;
-  accentColor: AccentColor;
-  onUpdateAccentColor: (color: AccentColor) => void;
   selectedMonth: string;
   authUserName?: string;
   authPictureUrl?: string;
@@ -31,8 +30,8 @@ interface ProfileViewProps {
   syncStatus: 'loading' | 'syncing' | 'synced' | 'error';
   syncError?: string;
   lastSyncedAt?: Date | null;
-  uiTheme?: 'sketch' | 'comic';
-  onUpdateUiTheme?: (theme: 'sketch' | 'comic') => void;
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
   onRetrySync: () => void;
   onSignOut: () => void;
 }
@@ -43,8 +42,6 @@ export default function ProfileView({
   currencySymbol,
   cashBalance,
   onUpdateCashBalance,
-  accentColor,
-  onUpdateAccentColor,
   selectedMonth,
   authUserName,
   authPictureUrl,
@@ -52,8 +49,8 @@ export default function ProfileView({
   syncStatus,
   syncError,
   lastSyncedAt,
-  uiTheme = 'sketch',
-  onUpdateUiTheme,
+  isDarkMode,
+  onToggleDarkMode,
   onRetrySync,
   onSignOut,
 }: ProfileViewProps) {
@@ -115,9 +112,9 @@ export default function ProfileView({
   }[syncStatus];
 
   return (
-    <div className="space-y-6 font-handwriting text-left">
-      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow">
-        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+    <div className="space-y-6 font-sans text-left">
+      <section className="glass-panel p-5 rounded-xl shadow-[var(--shadow-glow)] border border-[var(--border-glow)] ">
+        <h3 className="font-display text-base font-bold text-[var(--text-[var(--accent-primary)])] flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
           <User size={18} />
           <span>帳號資訊</span>
         </h3>
@@ -127,22 +124,22 @@ export default function ProfileView({
               <img
                 src={authPictureUrl}
                 alt=""
-                className="h-11 w-11 shrink-0 rounded-full object-cover sketch-border-sm"
+                className="h-11 w-11 shrink-0 rounded-full object-cover glass-panel"
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#06c755] text-white sketch-border-sm">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#06c755] text-white glass-panel">
                 <span className="text-lg font-bold">L</span>
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-sm font-bold text-on-surface-variant">
+              <p className="text-sm font-bold text-[var(--text-secondary)]">
                 LINE 帳號與雲端同步
               </p>
-              <p className="truncate text-base font-bold text-primary">
+              <p className="truncate text-base font-bold text-[var(--text-[var(--accent-primary)])]">
                 {authUserName || 'LINE 使用者'}
               </p>
-              <p className="text-xs text-on-surface-variant">
+              <p className="text-xs text-[var(--text-secondary)]">
                 {syncLabel}
               </p>
             </div>
@@ -151,22 +148,22 @@ export default function ProfileView({
           <button
             type="button"
             onClick={onSignOut}
-            className="flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-sm font-bold text-[#ba1a1a] sketch-border-sm"
+            className="flex shrink-0 items-center gap-1 bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-[var(--accent-error)] glass-panel"
           >
             <LogOut size={14} />
             登出
           </button>
         </div>
         {(authError || syncError) && (
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-dashed border-[#ba1a1a]/30 pt-2">
-            <p className="text-xs font-bold text-[#ba1a1a]">
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-dashed border-[var(--accent-error)]/30 pt-2">
+            <p className="text-xs font-bold text-[var(--accent-error)]">
               {syncError || authError}
             </p>
             {syncStatus === 'error' && (
               <button
                 type="button"
                 onClick={onRetrySync}
-                className="flex shrink-0 items-center gap-1 bg-white px-2 py-1 text-xs font-bold text-[#ba1a1a] sketch-border-sm"
+                className="flex shrink-0 items-center gap-1 bg-[var(--bg-card)] px-2 py-1 text-xs font-bold text-[var(--accent-error)] glass-panel"
               >
                 <RefreshCw size={13} />
                 重試
@@ -176,15 +173,15 @@ export default function ProfileView({
         )}
       </section>
 
-      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow">
-        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+      <section className="glass-panel p-5 rounded-xl shadow-[var(--shadow-glow)] border border-[var(--border-glow)] ">
+        <h3 className="font-display text-base font-bold text-[var(--text-[var(--accent-primary)])] flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
           <Banknote size={18} />
           <span>現金餘額</span>
         </h3>
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div>
-              <p className="text-sm font-bold text-on-surface-variant hidden">現金餘額</p>
+              <p className="text-sm font-bold text-[var(--text-secondary)] hidden">現金餘額</p>
               {editingCash ? (
                 <form onSubmit={handleSaveCash} className="mt-1 flex items-center gap-2">
                   <span className="text-base font-bold font-sans">{currencySymbol}</span>
@@ -193,13 +190,13 @@ export default function ProfileView({
                     type="number"
                     value={cashInput}
                     onChange={(e) => setCashInput(e.target.value)}
-                    className="w-28 border-b-2 border-outline bg-transparent py-0.5 text-base font-bold font-sans focus:border-primary focus:outline-none"
+                    className="w-28 rounded-md border border-[var(--border-color)] bg-[var(--bg-primary)] px-2 py-1 text-base font-bold font-sans focus:border-[var(--accent-primary)] focus:outline-none"
                   />
-                  <button type="submit" className="bg-[#c3ecd7] px-3 py-1 text-sm font-bold sketch-border-sm">確認</button>
-                  <button type="button" onClick={() => setEditingCash(false)} className="bg-white px-3 py-1 text-sm font-bold sketch-border-sm">取消</button>
+                  <button type="submit" className="bg-[var(--accent-success)] text-white px-3 py-1 text-sm font-bold glass-panel">確認</button>
+                  <button type="button" onClick={() => setEditingCash(false)} className="bg-[var(--bg-card)] px-3 py-1 text-sm font-bold glass-panel">取消</button>
                 </form>
               ) : (
-                <p className="text-xl font-bold text-primary font-sans">
+                <p className="text-xl font-bold text-[var(--text-[var(--accent-primary)])] font-sans">
                   {currencySymbol} {cashBalance.toLocaleString()}
                 </p>
               )}
@@ -211,7 +208,7 @@ export default function ProfileView({
                 setCashInput(String(cashBalance));
                 setEditingCash(true);
               }}
-              className="shrink-0 bg-white px-3 py-1 text-sm font-bold sketch-border-sm"
+              className="shrink-0 bg-[var(--bg-card)] px-3 py-1 text-sm font-bold glass-panel"
             >
               編輯
             </button>
@@ -220,104 +217,69 @@ export default function ProfileView({
       </section>
 
       {/* Credit card limit summary */}
-      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow space-y-4">
-        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+      <section className="glass-panel p-5 rounded-xl shadow-[var(--shadow-glow)] border border-[var(--border-glow)] space-y-4">
+        <h3 className="font-display text-base font-bold text-[var(--text-[var(--accent-primary)])] flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
           <CreditCard size={18} />
           <span>信用卡</span>
         </h3>
         <div>
           <div className="mb-2 flex items-center justify-end gap-3">
-            <span className="text-sm font-bold text-on-surface-variant">
+            <span className="text-sm font-bold text-[var(--text-secondary)]">
               總額度：
-              <span className="font-sans text-primary">
+              <span className="font-sans text-[var(--text-[var(--accent-primary)])]">
                 {currencySymbol} {totalCreditLimit.toLocaleString()}
               </span>
             </span>
           </div>
 
-          <div className="w-full h-5 rounded-full border-2 border-outline bg-white overflow-hidden relative p-0.5">
+          <div className="w-full h-5 rounded-full border-2 border-[var(--border-color)] bg-black/20 overflow-hidden relative p-0.5">
             <div
-              className="h-full rounded-full bg-[var(--accent-bg)] transition-all duration-500 sketch-border-sm"
+              className="h-full rounded-full bg-[var(--accent-primary)] transition-all duration-500 glass-panel"
               style={{ width: `${clampedCreditUsage}%` }}
             />
-            <span className="absolute inset-0 text-xs font-sans font-bold flex items-center justify-center text-primary">
+            <span className="absolute inset-0 text-xs font-sans font-bold flex items-center justify-center text-[var(--text-[var(--accent-primary)])]">
               {creditUsagePercent.toFixed(1)}%
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 pt-2 text-sm font-bold text-on-surface-variant border-t border-dashed border-[#75777d]/30">
+        <div className="grid grid-cols-2 gap-2 pt-2 text-sm font-bold text-[var(--text-secondary)] border-t border-dashed border-[#75777d]/30">
           <div className="space-y-1">
-            <p>本月刷卡：<span className="font-sans text-[#ba1a1a] text-base">{currencySymbol} {selectedMonthCardSpent.toLocaleString()}</span></p>
-            <p>剩餘額度：<span className="font-sans text-primary text-base">{currencySymbol} {Math.max(totalCreditLimit - selectedMonthCardSpent, 0).toLocaleString()}</span></p>
+            <p>本月刷卡：<span className="font-sans text-[var(--accent-error)] text-base">{currencySymbol} {selectedMonthCardSpent.toLocaleString()}</span></p>
+            <p>剩餘額度：<span className="font-sans text-[var(--text-[var(--accent-primary)])] text-base">{currencySymbol} {Math.max(totalCreditLimit - selectedMonthCardSpent, 0).toLocaleString()}</span></p>
           </div>
           <div className="space-y-1">
-            <p>持卡數量：<span className="font-sans text-primary text-base underline">{cards.length}</span> 張</p>
-            <p>累積回饋點數：<span className="font-sans text-secondary text-base">{selectedMonthPoints.toLocaleString()}</span> pts</p>
+            <p>持卡數量：<span className="font-sans text-[var(--text-[var(--accent-primary)])] text-base underline">{cards.length}</span> 張</p>
+            <p>累積回饋點數：<span className="font-sans text-[var(--text-secondary)] text-base">{selectedMonthPoints.toLocaleString()}</span> pts</p>
           </div>
         </div>
       </section>
-      <section className="bg-[var(--color-surface-bg)] p-5 sketch-border pencil-shadow space-y-5">
-        <h3 className="font-display text-base font-bold text-primary flex items-center gap-1.5 border-b border-[#75777d]/20 pb-2 mb-3">
+      <section className="glass-panel p-5 rounded-xl shadow-[var(--shadow-glow)] border border-[var(--border-glow)] space-y-5">
+        <h3 className="font-display text-base font-bold text-[var(--text-[var(--accent-primary)])] flex items-center gap-1.5 border-b border-[var(--border-color)] pb-2 mb-3">
           <Palette size={18} />
           <span>個人化設定</span>
         </h3>
         
-        <div className="space-y-3">
-          <p className="text-sm text-on-surface-variant font-bold">
-            輔色選擇
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-[var(--text-secondary)] font-bold">
+            日/夜間模式切換
           </p>
-          <div className="grid grid-cols-5 gap-3">
-            {(Object.keys(ACCENT_COLORS) as AccentColor[]).map((color) => {
-              const palette = ACCENT_COLORS[color];
-              return (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => onUpdateAccentColor(color)}
-                  aria-label={`選擇${color}輔色`}
-                  className="flex h-14 items-center justify-center rounded-sm border border-black/10 shadow-sm transition-transform hover:scale-105 active:scale-95"
-                  style={{ backgroundColor: palette.background }}
-                >
-                  {accentColor === color && (
-                    <span
-                      className="h-3 w-3 rounded-full border border-black/20"
-                      style={{ backgroundColor: palette.text }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-sm text-on-surface-variant font-bold">
-            介面風格
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => onUpdateUiTheme?.('sketch')}
-              className={`flex flex-col items-center justify-center p-3 gap-2 rounded-md transition-all sketch-border-sm ${uiTheme === 'sketch' ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-2 border-primary' : 'bg-[var(--color-surface-bg)] border border-[#75777d]/30'}`}
-            >
-              <span className="text-2xl">📝</span>
-              <span className="text-sm font-bold text-on-surface">手繪風</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onUpdateUiTheme?.('comic')}
-              className={`flex flex-col items-center justify-center p-3 gap-2 rounded-md transition-all sketch-border-sm ${uiTheme === 'comic' ? 'bg-[var(--accent-bg)] text-[var(--accent-text)] border-2 border-primary' : 'bg-[var(--color-surface-bg)] border border-[#75777d]/30'}`}
-            >
-              <span className="text-2xl">💬</span>
-              <span className="text-sm font-bold text-on-surface font-display">漫畫風</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onToggleDarkMode}
+            className="flex items-center justify-center p-3 gap-2 rounded-md transition-all glass-panel bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)]"
+          >
+            {isDarkMode ? (
+              <span className="flex items-center gap-2"><Moon size={16} className="text-[var(--accent-primary)]" /> <span>深色模式</span></span>
+            ) : (
+              <span className="flex items-center gap-2"><Sun size={16} className="text-[var(--accent-gold)]" /> <span>淺色模式</span></span>
+            )}
+          </button>
         </div>
       </section>
 
       {/* Credits */}
-      <footer className="text-center pt-4 text-xs text-outline font-handwriting font-bold">
+      <footer className="text-center pt-4 text-xs text-[var(--text-muted)] font-sans font-bold">
         <p>Copyright © 2026 CCRA Inc</p>
       </footer>
     </div>

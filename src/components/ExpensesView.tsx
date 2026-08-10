@@ -299,13 +299,13 @@ export default function ExpensesView({
   };
 
   return (
-    <div className="space-y-6 font-handwriting">
+    <div className="space-y-6 font-sans">
       {/* Month Carousel Navbar */}
-      <section className="flex items-center justify-between py-1 bg-[var(--color-surface-bg)] sketch-border-sm px-1.5 select-none">
+      <section className="flex items-center justify-between py-1 bg-[var(--bg-primary)] rounded-md px-1.5 select-none">
         <button
           onClick={() => handleMonthShift('prev')}
           disabled={selectedMonth === monthsList[0]}
-          className="p-2 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 transition-all cursor-pointer"
+          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-[var(--accent-primary)])] hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 transition-all cursor-pointer"
           aria-label="Previous Month"
         >
           <ChevronLeft />
@@ -322,7 +322,7 @@ export default function ExpensesView({
                 {prev ? (
                   <button
                     onClick={() => setSelectedMonth(prev)}
-                    className="w-16 sm:w-20 text-center text-on-surface-variant opacity-40 hover:opacity-85 transition-opacity py-0.5 cursor-pointer truncate"
+                    className="w-16 sm:w-20 text-center text-[var(--text-secondary)] opacity-40 hover:opacity-85 transition-opacity py-0.5 cursor-pointer truncate"
                   >
                     {prev}
                   </button>
@@ -331,7 +331,7 @@ export default function ExpensesView({
                 )}
 
                 {/* Selected month slot (Centered) */}
-                <div className="w-20 sm:w-24 text-center text-primary scale-105 sm:scale-110 font-bold font-display relative py-0.5 shrink-0">
+                <div className="w-20 sm:w-24 text-center text-[var(--accent-primary)] scale-105 sm:scale-110 font-bold font-display relative py-0.5 shrink-0">
                   {selectedMonth}
                   <div className="absolute -bottom-1 left-1 right-1 h-[6px] sketchy-border-bottom" />
                 </div>
@@ -340,7 +340,7 @@ export default function ExpensesView({
                 {next ? (
                   <button
                     onClick={() => setSelectedMonth(next)}
-                    className="w-16 sm:w-20 text-center text-on-surface-variant opacity-40 hover:opacity-85 transition-opacity py-0.5 cursor-pointer truncate"
+                    className="w-16 sm:w-20 text-center text-[var(--text-secondary)] opacity-40 hover:opacity-85 transition-opacity py-0.5 cursor-pointer truncate"
                   >
                     {next}
                   </button>
@@ -355,7 +355,7 @@ export default function ExpensesView({
         <button
           onClick={() => handleMonthShift('next')}
           disabled={selectedMonth === monthsList[monthsList.length - 1]}
-          className="p-2 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 transition-all cursor-pointer"
+          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-[var(--accent-primary)])] hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 transition-all cursor-pointer"
           aria-label="Next Month"
         >
           <ChevronRight />
@@ -367,7 +367,7 @@ export default function ExpensesView({
         <select
           value={filterCardId}
           onChange={(e) => setFilterCardId(e.target.value)}
-          className="w-full appearance-none border-2 border-outline rounded-md focus:border-primary focus:outline-none bg-white pl-4 pr-10 py-2.5 text-base font-bold font-sans text-center sketch-border-sm cursor-pointer"
+          className="w-full appearance-none border-2 border-[var(--border-color)] rounded-md focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] pl-4 pr-10 py-2.5 border-[var(--border-color)] text-[var(--text-[var(--accent-primary)])] shadow-[var(--shadow-glow)] text-base font-bold font-sans text-center rounded-md cursor-pointer"
         >
           <option value="all">全部消費</option>
           <option value="cash">現金 (Cash)</option>
@@ -377,7 +377,7 @@ export default function ExpensesView({
             </option>
           ))}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-on-surface-variant font-bold">
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[var(--text-secondary)] font-bold">
           <svg className="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
             <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
           </svg>
@@ -385,32 +385,32 @@ export default function ExpensesView({
       </section>
 
       {/* Summary Score Blocks */}
-      <section className="flex flex-row sketch-border pencil-shadow overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform rounded-xl">
+      <section className="flex flex-row glass-panel shadow-[var(--shadow-glow)] border border-[var(--border-glow)] overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform rounded-xl">
         {/* Total Expense */}
-        <div className="flex-1 bg-[var(--color-surface-bg)] p-3 sm:p-4 relative border-r border-outline/30 min-w-0">
-          <p className="text-xs sm:text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1 truncate">
+        <div className="flex-1 bg-[var(--bg-card)] p-3 sm:p-4 relative border-r border-[var(--border-color)]/30 min-w-0">
+          <p className="text-xs sm:text-sm font-black text-[var(--text-secondary)] uppercase tracking-wider mb-1 truncate">
             當月總消費
           </p>
-          <p className="text-lg sm:text-2xl font-bold font-display text-primary flex items-baseline gap-1 truncate">
+          <p className="text-lg sm:text-2xl font-bold font-display text-[var(--accent-primary)] flex items-baseline gap-1 truncate">
             <span className="text-sm sm:text-xl font-sans">{currencySymbol}</span>
             <span className="text-xl sm:text-3xl font-sans truncate">{totalExpense.toLocaleString()}</span>
           </p>
           <div className="absolute bottom-1 right-2 sm:bottom-2 sm:right-3 opacity-15">
-            <Layers size={32} className="text-primary sm:w-10 sm:h-10" />
+            <Layers size={32} className="text-[var(--accent-primary)] sm:w-10 sm:h-10" />
           </div>
         </div>
 
         {/* Total Rewards points */}
-        <div className="flex-1 bg-[var(--accent-bg)] p-3 sm:p-4 relative min-w-0">
-          <p className="text-xs sm:text-sm font-black text-on-surface-variant uppercase tracking-wider mb-1 truncate">
+        <div className="flex-1 bg-[var(--bg-secondary)] p-3 sm:p-4 relative min-w-0">
+          <p className="text-xs sm:text-sm font-black text-[var(--text-secondary)] uppercase tracking-wider mb-1 truncate">
             累計回饋點數
           </p>
-          <p className="text-lg sm:text-2xl font-bold font-display text-primary flex items-baseline gap-1 truncate">
+          <p className="text-lg sm:text-2xl font-bold font-display text-[var(--accent-primary)] flex items-baseline gap-1 truncate drop-shadow-[var(--shadow-glow)]">
             <span className="text-xl sm:text-3xl font-sans truncate">{totalRewardsPoints.toLocaleString()}</span>
-            <span className="text-xs sm:text-sm font-handwriting shrink-0">pts</span>
+            <span className="text-xs sm:text-sm font-sans shrink-0">pts</span>
           </p>
           <div className="absolute bottom-1 right-2 sm:bottom-2 sm:right-3 opacity-15">
-            <Coins size={32} className="text-primary sm:w-10 sm:h-10" />
+            <Coins size={32} className="text-[var(--accent-primary)] sm:w-10 sm:h-10" />
           </div>
         </div>
       </section>
@@ -418,16 +418,16 @@ export default function ExpensesView({
       {/* Transaction List / Card Spending Breakdown Container */}
       <section className="space-y-3 mt-6">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <h3 className="text-md font-bold text-on-surface-variant border-l-4 border-outline pl-2.5">
+          <h3 className="text-md font-bold text-[var(--text-secondary)] border-l-4 border-[var(--border-color)] pl-2.5">
             {contentView === 'list' ? '消費列表' : '卡片支出占比'}
           </h3>
-          <span className="text-center text-sm font-bold text-on-surface-variant">
-            共 <span className="font-sans text-primary">{filteredTransactions.length}</span> 筆
+          <span className="text-center text-sm font-bold text-[var(--text-secondary)]">
+            共 <span className="font-sans text-[var(--accent-primary)]">{filteredTransactions.length}</span> 筆
           </span>
           <button
             type="button"
             onClick={() => setContentView((view) => view === 'list' ? 'breakdown' : 'list')}
-            className="ml-auto flex items-center gap-1 bg-white px-2 py-1 text-xs font-bold text-on-surface-variant sketch-border-sm cursor-pointer hover:bg-neutral-50 transition-colors"
+            className="ml-auto flex items-center gap-1 glass-panel border-[var(--border-glow)] shadow-[var(--shadow-glow)] px-3 py-1.5 text-xs font-bold text-[var(--text-primary)] cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors"
           >
             {contentView === 'list' ? <PieChart size={14} /> : <List size={14} />}
             {contentView === 'list' ? '卡片占比' : '消費列表'}
@@ -435,8 +435,8 @@ export default function ExpensesView({
         </div>
 
         {filteredTransactions.length === 0 ? (
-          <div className="text-center py-10 bg-white/30 border border-dashed border-[#75777d]/30 p-6 rounded-md">
-            <p className="text-on-surface-variant text-sm font-bold">這個月度目前還沒有建立消費記錄唷！</p>
+          <div className="text-center py-10 bg-[var(--bg-card)] border border-dashed border-[var(--border-color)] shadow-[var(--shadow-glow)] p-6 rounded-md">
+            <p className="text-[var(--text-[var(--accent-primary)])] text-base font-bold">這個月度目前還沒有建立消費記錄唷！</p>
             <p className="text-outline text-xs mt-1">點選右上角 ＋，新增一筆消費紀錄。</p>
           </div>
         ) : contentView === 'list' ? (
@@ -456,30 +456,30 @@ export default function ExpensesView({
                 >
                   <div className="flex items-center gap-4">
                     {/* Card image or cash badge */}
-                    <div className="w-16 h-10 shrink-0 rounded-sm overflow-hidden sketch-border-sm bg-[var(--color-surface-container)] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                    <div className="w-16 h-10 shrink-0 rounded-sm overflow-hidden rounded-md glass-panel flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                       {isCash ? (
-                        <span className="text-xs font-bold text-on-surface-variant px-1 text-center leading-tight">現金</span>
+                        <span className="text-xs font-bold text-[var(--text-secondary)] px-1 text-center leading-tight">現金</span>
                       ) : pairedCard?.cardImage ? (
                         <img src={pairedCard.cardImage} alt={pairedCard.name} className="w-full h-full object-contain p-0.5" />
                       ) : (
-                        <span className="text-[10px] font-bold text-on-surface-variant px-1 text-center leading-tight">{pairedCard?.bankCode}</span>
+                        <span className="text-[10px] font-bold text-[var(--text-secondary)] px-1 text-center leading-tight">{pairedCard?.bankCode}</span>
                       )}
                     </div>
 
                     <div className="text-left flex flex-col gap-1">
                       <div className="flex items-center gap-2 pr-2">
-                        <p className="text-xl font-bold text-on-surface truncate">
+                        <p className="text-xl font-bold text-[var(--text-[var(--accent-primary)])] truncate">
                           {tx.merchant}
                         </p>
                       </div>
-                      <div className="text-sm text-on-surface-variant font-sans flex items-center gap-1.5 flex-wrap">
+                      <div className="text-sm text-[var(--text-secondary)] font-sans flex items-center gap-1.5 flex-wrap">
                         <span>{translateDateString(tx.date)}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-[22px] font-bold text-[#ba1a1a] font-sans leading-tight">
+                    <p className="text-[22px] font-bold text-[var(--accent-error)] font-sans leading-tight">
                       -{pairedCard?.currency || currencySymbol}{tx.amount.toLocaleString()}
                     </p>
                     <p className="text-sm font-bold text-secondary flex items-center justify-end gap-1 mt-0.5">
@@ -497,7 +497,7 @@ export default function ExpensesView({
             })}
           </div>
         ) : (
-          <div className="space-y-4 bg-[var(--color-surface-container-low)]/20 p-4 sketch-border pencil-shadow rounded-xl">
+          <div className="space-y-4 glass-panel border border-[var(--border-glow)] shadow-[var(--shadow-glow)] p-4 rounded-xl">
             {(() => {
               const cx = 100;
               const cy = 100;
@@ -584,9 +584,9 @@ export default function ExpensesView({
                     </div>
 
                     {/* Total Summary Info Banner below Pizza Chart */}
-                    <div className="mt-3 flex items-center gap-2 px-3 py-1 bg-white/80 sketch-border-sm text-xs font-bold text-on-surface-variant">
+                    <div className="mt-3 flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-md shadow-sm text-xs font-bold text-[var(--text-secondary)]">
                       <span>當月總支出</span>
-                      <span className="font-sans text-primary font-bold text-sm">
+                      <span className="font-sans text-[var(--accent-primary)] font-bold text-sm">
                         {currencySymbol}{totalExpense.toLocaleString()}
                       </span>
                       <span className="opacity-40">•</span>
@@ -601,7 +601,7 @@ export default function ExpensesView({
                       return (
                         <div
                           key={item.id}
-                          className="p-3 bg-white/90 rounded-md sketch-border-sm space-y-2 hover:bg-white transition-all shadow-xs"
+                          className="p-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-md space-y-2 hover:bg-[var(--bg-card-hover)] transition-all shadow-[var(--shadow-glow)]"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">
@@ -609,36 +609,36 @@ export default function ExpensesView({
                                 className="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs border border-black/10"
                                 style={{ backgroundColor: item.color }}
                               />
-                              <div className="w-10 h-6 shrink-0 rounded-sm overflow-hidden sketch-border-sm bg-[var(--color-surface-container)] flex items-center justify-center">
+                              <div className="w-10 h-6 shrink-0 rounded-sm overflow-hidden rounded-md glass-panel flex items-center justify-center">
                                 {isCash ? (
-                                  <span className="text-[10px] font-bold text-on-surface-variant">現金</span>
+                                  <span className="text-[10px] font-bold text-[var(--text-secondary)]">現金</span>
                                 ) : item.cardImage ? (
                                   <img src={item.cardImage} alt={item.name} className="w-full h-full object-contain p-0.5" />
                                 ) : (
-                                  <span className="text-[9px] font-bold text-on-surface-variant">{item.bankCode}</span>
+                                  <span className="text-[9px] font-bold text-[var(--text-secondary)]">{item.bankCode}</span>
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-xs sm:text-sm font-bold text-on-surface truncate">
+                                <p className="text-xs sm:text-sm font-bold text-[var(--text-[var(--accent-primary)])] truncate">
                                   {item.name}
                                   {!isCash && item.lastFour && (
-                                    <span className="text-xs text-on-surface-variant font-sans ml-1 font-normal">
+                                    <span className="text-xs text-[var(--text-secondary)] font-sans ml-1 font-normal">
                                       (*{item.lastFour})
                                     </span>
                                   )}
                                 </p>
-                                <p className="text-[11px] text-on-surface-variant font-sans">
+                                <p className="text-[11px] text-[var(--text-secondary)] font-sans">
                                   {item.txCount} 筆消費
                                 </p>
                               </div>
                             </div>
 
                             <div className="text-right shrink-0">
-                              <p className="text-sm sm:text-base font-bold text-[#ba1a1a] font-sans leading-tight">
+                              <p className="text-sm sm:text-base font-bold text-[var(--accent-error)] font-sans leading-tight">
                                 -{currencySymbol}{item.totalAmount.toLocaleString()}
                               </p>
                               <div className="flex items-center justify-end gap-1.5 text-xs mt-0.5">
-                                <span className="font-sans font-bold px-1.5 py-0.2 rounded bg-black/5 text-on-surface-variant">
+                                <span className="font-sans font-bold px-1.5 py-0.5 rounded bg-[var(--bg-card-hover)] text-[var(--text-secondary)] border border-[var(--border-color)]">
                                   {item.percentage.toFixed(1)}%
                                 </span>
                                 {item.earnedPoints > 0 && (
@@ -652,7 +652,7 @@ export default function ExpensesView({
                           </div>
 
                           {/* Progress Bar */}
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-black/5 p-0.5">
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-card-hover)] p-0.5 border border-white/5">
                             <div
                               className="h-full rounded-full transition-all duration-500"
                               style={{
@@ -679,19 +679,19 @@ export default function ExpensesView({
             onClick={() => setTransactionPendingDelete(null)}
           >
             <div
-              className="w-full max-w-sm bg-[var(--color-surface-bg)] p-6 sketch-border sketch-shadow -rotate-[0.5deg]"
+              className="w-full max-w-sm bg-[var(--bg-primary)] p-6   -rotate-[0.5deg]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffdad6] sketch-border-sm">
-                  <Trash2 size={20} className="text-[#ba1a1a]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-error)]/20 text-[var(--accent-error)] rounded-md">
+                  <Trash2 size={20} className="text-[var(--accent-error)]" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-bold text-[#ba1a1a]">確定刪除消費紀錄？</h3>
-                  <p className="mt-2 text-sm font-bold text-on-surface">
+                  <h3 className="font-display text-lg font-bold text-[var(--accent-error)]">確定刪除消費紀錄？</h3>
+                  <p className="mt-2 text-sm font-bold text-[var(--text-[var(--accent-primary)])]">
                     {transactionPendingDelete.merchant}
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
                     金額 {currencySymbol} {transactionPendingDelete.amount.toLocaleString()}，刪除後無法復原。
                   </p>
                 </div>
@@ -701,7 +701,7 @@ export default function ExpensesView({
                 <button
                   type="button"
                   onClick={() => setTransactionPendingDelete(null)}
-                  className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-bg)] hover:bg-[var(--color-surface-variant)] text-xs font-bold"
+                  className="px-4 py-2 rounded-md bg-[var(--bg-primary)] hover:bg-[var(--color-surface-variant)] text-xs font-bold"
                 >
                   取消
                 </button>
@@ -712,7 +712,7 @@ export default function ExpensesView({
                     setTransactionPendingDelete(null);
                     handleCloseModal();
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 sketch-border-sm bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[var(--accent-error)]/20 text-[var(--accent-error)] text-[var(--accent-error)] hover:bg-[#ffb4ab] text-xs font-bold pencil-shadow"
                 >
                   <Trash2 size={14} />
                   確認刪除
@@ -731,18 +731,18 @@ export default function ExpensesView({
             onClick={handleCloseModal}
           >
             <div
-              className="bg-[var(--color-surface-bg)] sketch-border sketch-shadow w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
+              className="glass-panel shadow-[var(--shadow-glow)] border-[var(--border-glow)] w-full max-w-md max-h-[85dvh] flex flex-col min-h-0 transform scale-100 transition-all duration-300 relative overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Fixed Header */}
-              <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 bg-[var(--color-surface-bg)]`}>
-                <h3 className="font-display text-lg font-bold text-primary">
+              <div className={`flex items-center justify-between p-3.5 sm:p-4 border-b-2 border-[var(--border-color)]  shrink-0 bg-[var(--bg-card)]`}>
+                <h3 className="font-display text-lg font-bold text-[var(--accent-primary)]">
                   {editingTransaction ? '修改消費紀錄' : '記錄新消費'}
                 </h3>
                 <button
                   type="button"
                 onClick={handleCloseModal}
-                className="text-on-surface-variant hover:text-on-surface p-1 text-base font-bold leading-none cursor-pointer"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-[var(--accent-primary)])] p-1 text-base font-bold leading-none cursor-pointer"
               >
                 ✕
               </button>
@@ -754,7 +754,7 @@ export default function ExpensesView({
                 {/* 2-column grid for Date and Amount */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       日期 *
                     </label>
                     <input
@@ -762,12 +762,12 @@ export default function ExpensesView({
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1 text-sm cursor-pointer"
+                      className="w-full rounded-md border border-[var(--border-color)] focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 font-sans text-sm cursor-pointer"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       交易金額 *
                     </label>
                     <input
@@ -777,13 +777,13 @@ export default function ExpensesView({
                       placeholder="ex: 1000"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm font-sans"
+                      className="w-full rounded-md border border-[var(--border-color)] focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 font-sans text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                     消費項目 *
                   </label>
                   <input
@@ -792,12 +792,12 @@ export default function ExpensesView({
                     placeholder="ex: 早餐, 衣服, 高鐵"
                     value={merchant}
                     onChange={(e) => setMerchant(e.target.value)}
-                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent placeholder-neutral-500 font-handwriting py-1 text-sm"
+                    className="w-full rounded-md border border-[var(--border-color)] focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 font-sans text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                     扣款方式 *
                   </label>
                   <select
@@ -809,7 +809,7 @@ export default function ExpensesView({
                       const targetCard = cards.find(c => c.id === newId);
                       setRewardScenarioId(targetCard?.rewardScenarios?.[0]?.id || '');
                     }}
-                    className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
+                    className="w-full rounded-md border border-[var(--border-color)] focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 font-sans text-sm cursor-pointer"
                   >
                     <option value="cash">
                       現金（餘額 {currencySymbol} {cashBalance.toLocaleString()}）
@@ -824,13 +824,13 @@ export default function ExpensesView({
 
                 {cardId !== 'cash' && rewardScenarios.length > 0 && (
                   <div>
-                    <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
                       消費方式 *
                     </label>
                     <select
                       value={activeScenarioId}
                       onChange={(e) => setRewardScenarioId(e.target.value)}
-                      className="w-full border-b-2 border-outline focus:border-primary focus:outline-none bg-transparent font-handwriting py-1.5 text-sm cursor-pointer"
+                      className="w-full rounded-md border border-[var(--border-color)] focus:border-[var(--accent-primary)] focus:outline-none bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 font-sans text-sm cursor-pointer"
                     >
                       {rewardScenarios.map((scenario) => (
                         <option key={scenario.id} value={scenario.id}>
@@ -896,18 +896,18 @@ export default function ExpensesView({
                       const currentRate = baseRate + exclusiveRate + additiveRate;
 
                       return (
-                        <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-on-surface-variant">
+                        <div className="mt-2 space-y-2 text-[11px] leading-relaxed text-[var(--text-secondary)]">
                           {selectedScenario.limit && (
-                            <div className={`text-[#846b12] bg-[var(--color-surface-container)] p-2 rounded-sm border ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/30 font-handwriting`}>
-                              <span className="font-bold text-on-surface">上限：</span>
+                            <div className={`text-[#846b12] glass-panel p-2 rounded-sm border  border-[var(--border-color)]/30 font-sans`}>
+                              <span className="font-bold text-[var(--text-[var(--accent-primary)])]">上限：</span>
                               {selectedScenario.limit}
                             </div>
                           )}
 
                           {/* Exclusive (radio) rows — mutually exclusive modes */}
                           {hasExclusiveRows && card && onUpdateCard && (
-                            <div className="mt-2 sketch-border-sm rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
-                              <p className={`font-bold text-on-surface text-xs bg-[var(--color-surface-container)] px-2.5 py-1.5 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+                            <div className="mt-2 rounded-md rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
+                              <p className={`font-bold text-[var(--text-[var(--accent-primary)])] text-xs glass-panel px-2.5 py-1.5 border-b-2 border-[var(--border-color)] `}>
                                 選擇回饋模式（擇一）：
                               </p>
                               {exclusiveRows.map((row, idx) => {
@@ -916,8 +916,8 @@ export default function ExpensesView({
                                   <label
                                     key={row.key}
                                     className={`flex items-center gap-2 px-2.5 py-1.5 cursor-pointer transition-colors ${
-                                      idx < exclusiveRows.length - 1 ? `border-b ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/20` : ''
-                                    } ${isSelected ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[var(--color-surface-container-high)]'}`}
+                                      idx < exclusiveRows.length - 1 ? `border-b  border-[var(--border-color)]/20` : ''
+                                    } ${isSelected ? 'bg-[var(--accent-primary)]/20' : 'hover:bg-[var(--bg-card-hover)]'}`}
                                   >
                                     <input
                                       type="radio"
@@ -931,13 +931,13 @@ export default function ExpensesView({
                                         onUpdateCard({ ...card, achievedConditions: [...current, row.key] });
                                       }}
                                     />
-                                    <span className={`flex-1 text-xs font-handwriting leading-snug ${isSelected ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                    <span className={`flex-1 text-xs font-sans leading-snug ${isSelected ? 'text-[var(--text-[var(--accent-primary)])] font-bold' : 'text-[var(--text-secondary)]'}`}>
                                       {row.label}
                                     </span>
-                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-handwriting sketch-border-sm ${
+                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-sans rounded-md ${
                                       isSelected
-                                        ? 'bg-[var(--accent-bg)] text-[var(--accent-text)]'
-                                        : 'bg-[var(--color-surface-bg)] text-on-surface-variant'
+                                        ? 'bg-[var(--accent-primary)] text-white'
+                                        : 'bg-[var(--bg-primary)] text-[var(--text-secondary)]'
                                     }`}>
                                       +{row.rate}%
                                     </span>
@@ -949,8 +949,8 @@ export default function ExpensesView({
 
                           {/* Additive (checkbox) rows */}
                           {hasAdditiveRows && card && onUpdateCard && (
-                            <div className="mt-2 sketch-border-sm rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
-                              <p className={`font-bold text-on-surface text-xs bg-[var(--color-surface-container)] px-2.5 py-1.5 border-b-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+                            <div className="mt-2 rounded-md rounded-sm overflow-hidden bg-[var(--color-surface-container-low)]">
+                              <p className={`font-bold text-[var(--text-[var(--accent-primary)])] text-xs glass-panel px-2.5 py-1.5 border-b-2 border-[var(--border-color)] `}>
                                 勾選達成的加成條件：
                               </p>
                               {additiveRows.map((row, idx) => {
@@ -959,12 +959,12 @@ export default function ExpensesView({
                                   <label
                                     key={row.key}
                                     className={`flex items-center gap-2 px-2.5 py-1.5 cursor-pointer transition-colors ${
-                                      idx < additiveRows.length - 1 ? `border-b ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} border-outline/20` : ''
-                                    } ${isChecked ? 'bg-[var(--accent-bg)]/20' : 'hover:bg-[var(--color-surface-container-high)]'}`}
+                                      idx < additiveRows.length - 1 ? `border-b  border-[var(--border-color)]/20` : ''
+                                    } ${isChecked ? 'bg-[var(--accent-primary)]/20' : 'hover:bg-[var(--bg-card-hover)]'}`}
                                   >
                                     <input
                                       type="checkbox"
-                                      className="w-3.5 h-3.5 rounded-sm border-outline accent-primary shrink-0 cursor-pointer"
+                                      className="w-3.5 h-3.5 rounded-sm border-[var(--border-color)] accent-primary shrink-0 cursor-pointer"
                                       checked={isChecked}
                                       onChange={() => {
                                         const current = card.achievedConditions || [];
@@ -974,13 +974,13 @@ export default function ExpensesView({
                                         onUpdateCard({ ...card, achievedConditions: newConditions });
                                       }}
                                     />
-                                    <span className={`flex-1 text-xs font-handwriting leading-snug ${isChecked ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                    <span className={`flex-1 text-xs font-sans leading-snug ${isChecked ? 'text-[var(--text-[var(--accent-primary)])] font-bold' : 'text-[var(--text-secondary)]'}`}>
                                       {row.label}
                                     </span>
-                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-handwriting sketch-border-sm ${
+                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold font-sans rounded-md ${
                                       isChecked
-                                        ? 'bg-[var(--accent-bg)] text-[var(--accent-text)]'
-                                        : 'bg-[var(--color-surface-bg)] text-on-surface-variant'
+                                        ? 'bg-[var(--accent-primary)] text-white'
+                                        : 'bg-[var(--bg-primary)] text-[var(--text-secondary)]'
                                     }`}>
                                       +{row.rate}%
                                     </span>
@@ -990,9 +990,9 @@ export default function ExpensesView({
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between mt-2 px-2.5 py-1.5 bg-[var(--accent-bg)] text-[var(--accent-text)] sketch-border-sm pencil-shadow">
-                            <span className="text-xs font-bold font-handwriting">預估回饋</span>
-                            <span className="text-sm font-bold font-handwriting">{Math.round(currentRate * 100) / 100}%</span>
+                          <div className="flex items-center justify-between mt-2 px-2.5 py-2 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 rounded-md shadow-sm">
+                            <span className="text-xs font-bold font-sans">預估回饋</span>
+                            <span className="text-sm font-bold font-sans">{Math.round(currentRate * 100) / 100}%</span>
                           </div>
                         </div>
                       );
@@ -1002,12 +1002,12 @@ export default function ExpensesView({
               </div>
 
               {/* Fixed Bottom Action Bar */}
-              <div className={`p-3 bg-[var(--color-surface-bg)] border-t-2 border-outline ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'} shrink-0 flex justify-between items-center gap-2`}>
+              <div className={`p-3 bg-[var(--bg-primary)] border-t-2 border-[var(--border-color)]  shrink-0 flex justify-between items-center gap-2`}>
                 {editingTransaction ? (
                   <button
                     type="button"
                     onClick={() => setTransactionPendingDelete(editingTransaction)}
-                    className="flex items-center gap-1.5 px-3 py-2 text-[#ba1a1a] bg-[#ffdad6]/60 hover:bg-[#ffdad6] active:scale-95 sketch-border-sm text-xs font-bold font-handwriting transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 text-[var(--accent-error)] bg-[var(--accent-error)]/20 hover:bg-[var(--accent-error)]/20 text-[var(--accent-error)] active:scale-95 rounded-md text-xs font-bold font-sans transition-colors cursor-pointer"
                   >
                     <Trash2 size={14} />
                     刪除
@@ -1017,14 +1017,14 @@ export default function ExpensesView({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="px-4 py-2 sketch-border-sm bg-[var(--color-surface-container-high)] text-on-surface hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting cursor-pointer"
+                    className="px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] active:scale-95 text-sm font-bold font-sans cursor-pointer transition-all"
                     onClick={handleCloseModal}
                   >
                     取消
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2 sketch-border-sm bg-[var(--accent-bg)] text-[var(--accent-text)] hover:brightness-95 active:scale-95 text-xs font-bold font-handwriting pencil-shadow cursor-pointer"
+                    className="px-6 py-2 rounded-full  bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/25  hover:brightness-95 active:scale-95 text-sm font-bold font-sans cursor-pointer shadow-[var(--shadow-glow)] transition-all"
                   >
                     {editingTransaction ? '確認修改' : '建立消費紀錄'}
                   </button>

@@ -70,14 +70,3 @@ export interface Budget {
   currency: string;
 }
 
-export type AccentColor =
-  | 'lime'
-  | 'yellow'
-  | 'orange'
-  | 'pink'
-  | 'magenta'
-  | 'cyan'
-  | 'aqua'
-  | 'blue'
-  | 'steel'
-  | 'violet';

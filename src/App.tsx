@@ -4,8 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { AccentColor, Card, Transaction } from './types';
-import { ACCENT_COLORS } from './theme';
+import { Card, Transaction } from './types';
 import { Edit3, Plus, CreditCard, User } from 'lucide-react';
 import CardsView from './components/CardsView';
 import ExpensesView from './components/ExpensesView';
@@ -67,8 +66,6 @@ export default function App() {
 
   // Ledger configuration
   const [cashBalance, setCashBalance] = useState(0);
-  const [accentColor, setAccentColor] = useState<AccentColor>('pink');
-  const accent = ACCENT_COLORS[accentColor];
   
   // Database States
   const [cards, setCards] = useState<Card[]>([]);
@@ -94,8 +91,8 @@ export default function App() {
     const now = new Date();
     return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
-  const [uiTheme, setUiTheme] = useState<'sketch' | 'comic'>(() => {
-    return (localStorage.getItem('ccra_ui_theme') as 'sketch' | 'comic') || 'sketch';
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('ccra_dark_mode') === 'true';
   });
   const lineDisplayName =
     authUser?.user_metadata?.display_name ??
@@ -103,17 +100,16 @@ export default function App() {
     'LINE 使用者';
 
   useEffect(() => {
-    if (uiTheme === 'comic') {
-      document.body.classList.add('theme-comic');
+    if (isDarkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('ccra_dark_mode', 'true');
     } else {
-      document.body.classList.remove('theme-comic');
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('ccra_dark_mode', 'false');
     }
-  }, [uiTheme]);
+  }, [isDarkMode]);
 
-  useEffect(() => {
-    document.documentElement.style.setProperty('--accent-bg', accent.background);
-    document.documentElement.style.setProperty('--accent-text', accent.text);
-  }, [accent]);
+
 
   useEffect(() => {
     [
@@ -278,9 +274,7 @@ export default function App() {
 
           const profile = profileResult.data;
           const cloudCash = Number(profile.cash_balance);
-          const cloudAccent = profile.accent_color as AccentColor;
           setCashBalance(cloudCash);
-          if (ACCENT_COLORS[cloudAccent]) setAccentColor(cloudAccent);
 
           setCloudReadyUserId(authUser.id);
           setSyncStatus('synced');
@@ -320,7 +314,6 @@ export default function App() {
           id: authUser.id,
           display_name: lineDisplayName,
           cash_balance: cashBalance,
-          accent_color: accentColor,
         }, { onConflict: 'id' });
         if (profileError) throw profileError;
 
@@ -431,7 +424,6 @@ export default function App() {
 
     return () => window.clearTimeout(timeout);
   }, [
-    accentColor,
     authUser,
     cards,
     cashBalance,
@@ -551,13 +543,13 @@ export default function App() {
     if (catalogStatus === 'error') {
       return (
         <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-sm bg-[#fdf9e9] p-6 text-center sketch-border sketch-shadow">
-            <p className="font-display text-lg font-bold text-primary">信用卡資料載入失敗</p>
-            <p className="mt-2 text-xs text-[#ba1a1a]">{catalogError}</p>
+          <div className="w-full max-w-sm bg-[var(--bg-card)] p-6 text-center glass-panel ">
+            <p className="font-display text-lg font-bold text-[var(--text-[var(--accent-primary)])]">信用卡資料載入失敗</p>
+            <p className="mt-2 text-xs text-[var(--accent-error)]">{catalogError}</p>
             <button
               type="button"
               onClick={() => setCatalogRetryNonce((value) => value + 1)}
-              className="mt-4 bg-white px-4 py-2 text-xs font-bold sketch-border-sm"
+              className="mt-4 bg-[var(--bg-card)] px-4 py-2 text-xs font-bold glass-panel"
             >
               重新載入
             </button>
@@ -569,13 +561,13 @@ export default function App() {
     if (syncStatus === 'error') {
       return (
         <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-sm bg-[#fdf9e9] p-6 text-center sketch-border sketch-shadow">
-            <p className="font-display text-lg font-bold text-primary">雲端資料載入失敗</p>
-            <p className="mt-2 text-xs text-[#ba1a1a]">{syncError}</p>
+          <div className="w-full max-w-sm bg-[var(--bg-card)] p-6 text-center glass-panel ">
+            <p className="font-display text-lg font-bold text-[var(--text-[var(--accent-primary)])]">雲端資料載入失敗</p>
+            <p className="mt-2 text-xs text-[var(--accent-error)]">{syncError}</p>
             <button
               type="button"
               onClick={() => setCloudRetryNonce((value) => value + 1)}
-              className="mt-4 bg-white px-4 py-2 text-xs font-bold sketch-border-sm"
+              className="mt-4 bg-[var(--bg-card)] px-4 py-2 text-xs font-bold glass-panel"
             >
               重新載入
             </button>
@@ -589,22 +581,18 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col h-dvh w-full font-sans transition-colors duration-300 overflow-hidden bg-[var(--color-surface-bg)]"
-      style={{
-        '--accent-bg': accent.background,
-        '--accent-text': accent.text,
-      } as React.CSSProperties}
+      className="flex flex-col h-dvh w-full font-sans transition-colors duration-300 overflow-hidden bg-[var(--bg-primary)]"
     >
       
       {/* TopAppBar */}
-      <header className={`shrink-0 pt-safe bg-[var(--color-surface-bg)] border-b-2 border-outline px-4 py-3 shadow-sm select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+      <header className={`shrink-0 pt-safe bg-[var(--bg-card)] border-b-2 border-[var(--border-color)] px-4 py-3 shadow-sm select-none`}>
         <div className="flex justify-between items-center w-full max-w-screen-md mx-auto">
           {/* Symmetrical Left Spacer to keep title centered */}
           <div className="w-9 h-9" />
 
           {/* Centered book branding */}
           <div className="text-center">
-            <h1 className="font-display text-2xl font-black text-primary tracking-tight">
+            <h1 className="font-display text-2xl font-black text-[var(--text-[var(--accent-primary)])] tracking-tight">
               {getHeaderTitleText()}
             </h1>
           </div>
@@ -613,10 +601,10 @@ export default function App() {
           {activeTab !== 'profile' ? (
             <button 
               onClick={handleQuickAddClick}
-              className="text-on-surface-variant hover:bg-[var(--accent-bg)] transition-colors p-2 rounded-full active:scale-95 transition-transform cursor-pointer w-9 h-9 flex items-center justify-center"
+              className="text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors p-2 rounded-full active:scale-95 transition-transform cursor-pointer w-9 h-9 flex items-center justify-center"
               title={activeTab === 'expense' ? "新增消費" : "新增信用卡"}
             >
-              <Plus size={20} className="text-[#75777d]" />
+              <Plus size={20} className="text-[var(--text-secondary)]" />
             </button>
           ) : (
             <div className="w-9 h-9" />
@@ -638,7 +626,6 @@ export default function App() {
             currencySymbol={getDisplayCurrencySymbol()}
             isAddingCard={isAddingCard}
             setIsAddingCard={setIsAddingCard}
-            uiTheme={uiTheme}
             onAddExpenseForCard={(cardId) => {
               setPreselectedExpenseCardId(cardId);
               setActiveTab('expense');
@@ -663,7 +650,6 @@ export default function App() {
             initialCardId={preselectedExpenseCardId}
             onClearInitialCard={() => setPreselectedExpenseCardId(null)}
             onUpdateCard={handleUpdateCard}
-            uiTheme={uiTheme}
           />
         )}
 
@@ -676,10 +662,6 @@ export default function App() {
             onUpdateCashBalance={(amount) => {
               setCashBalance(amount);
             }}
-            accentColor={accentColor}
-            onUpdateAccentColor={(color) => {
-              setAccentColor(color);
-            }}
             selectedMonth={selectedExpenseMonth}
             authUserName={lineDisplayName}
             authPictureUrl={authUser?.user_metadata?.picture_url}
@@ -687,11 +669,8 @@ export default function App() {
             syncStatus={syncStatus}
             syncError={syncError}
             lastSyncedAt={lastSyncedAt}
-            uiTheme={uiTheme}
-            onUpdateUiTheme={(theme) => {
-              setUiTheme(theme);
-              localStorage.setItem('ccra_ui_theme', theme);
-            }}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
             onRetrySync={() => setSyncRetryNonce((value) => value + 1)}
             onSignOut={() => {
               if (!supabase) return;
@@ -711,7 +690,7 @@ export default function App() {
       </main>
 
       {/* Bottom Tab Navigator — outside the scroll area so it never scrolls away */}
-      <nav className={`shrink-0 pb-safe bg-[var(--color-surface-bg)] border-t-2 border-outline select-none ${uiTheme === 'comic' ? 'border-solid' : 'border-dashed'}`}>
+      <nav className={`shrink-0 pb-safe bg-[var(--bg-card)] border-t border-[var(--border-color)] select-none backdrop-blur-md`}>
         <div className="flex justify-around items-center h-20 px-4 w-full max-w-screen-md mx-auto">
           
           {/* Tab 1: Expense */}
@@ -719,8 +698,8 @@ export default function App() {
             onClick={() => setActiveTab('expense')}
             className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'expense'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
+                ? 'text-white bg-[var(--accent-primary)] shadow-[var(--shadow-glow)] border border-[var(--border-glow)] scale-105 font-bold font-sans'
+                : 'text-[var(--text-secondary)] opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
             <Edit3 size={18} className="mb-0.5" />
@@ -734,8 +713,8 @@ export default function App() {
             onClick={() => setActiveTab('cards')}
             className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'cards'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
+                ? 'text-white bg-[var(--accent-primary)] shadow-[var(--shadow-glow)] border border-[var(--border-glow)] scale-105 font-bold font-sans'
+                : 'text-[var(--text-secondary)] opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
             <CreditCard size={18} className="mb-0.5" />
@@ -749,8 +728,8 @@ export default function App() {
             onClick={() => setActiveTab('profile')}
             className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
               activeTab === 'profile'
-                ? 'text-[var(--accent-text)] bg-[var(--accent-bg)] ring-1 ring-[#75777d] sketch-border-sm scale-105 font-bold font-handwriting'
-                : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
+                ? 'text-white bg-[var(--accent-primary)] shadow-[var(--shadow-glow)] border border-[var(--border-glow)] scale-105 font-bold font-sans'
+                : 'text-[var(--text-secondary)] opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
             }`}
           >
             <User size={18} className="mb-0.5" />
