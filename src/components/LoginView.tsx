@@ -37,7 +37,7 @@ export default function LoginView({
             type="button"
             disabled={loading}
             onClick={onLineLogin}
-            className="mx-auto flex w-full items-center justify-center gap-2 bg-[#06c755] px-5 py-3 text-base font-bold text-white glass-panel  transition-transform active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+            className="mx-auto flex w-full items-center justify-center gap-2 bg-[#06c755] rounded-full px-5 py-3 text-base font-bold text-white shadow-md transition-transform active:scale-[0.98] hover:brightness-105 disabled:cursor-wait disabled:opacity-60"
           >
             <LogIn size={20} />
             {loading ? '正在確認登入狀態...' : '使用 LINE 登入'}

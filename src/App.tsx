@@ -613,7 +613,7 @@ export default function App() {
       </header>
 
       {/* Main Pages Content Area */}
-      <main className="app-scroll-area w-full max-w-screen-md mx-auto px-4 py-6">
+      <main className="app-scroll-area w-full max-w-screen-md mx-auto px-4 py-6 min-h-0">
         {activeTab === 'cards' && (
           <CardsView
             cards={cards}

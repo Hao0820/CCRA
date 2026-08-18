@@ -539,27 +539,26 @@ export default function CardsView({
                 </div>
               )}
 
-              {(!selectedCard.rewardScenarios || selectedCard.rewardScenarios.length === 0) && (
+              {selectedCard.rewardDesc && (
                 <div>
-                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 mt-4">
                     回饋規則 (Reward Details)
                   </p>
-                  <div className="text-xs text-[var(--text-[var(--accent-primary)])] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 glass-panel">
+                  <div className="text-xs text-[var(--text-[var(--accent-primary)])] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 shadow-[var(--shadow-glow)] border border-[var(--border-glow)] rounded-md">
                     <Award size={16} className="text-[var(--text-secondary)] mt-0.5 shrink-0" />
-                    <span className="font-sans">{selectedCard.rewardDesc}</span>
+                    <span className="font-sans whitespace-pre-wrap">{selectedCard.rewardDesc}</span>
                   </div>
                 </div>
               )}
 
-              {selectedCard.rewardLimitSummary &&
-                (!selectedCard.rewardScenarios || selectedCard.rewardScenarios.length === 0) && (
+              {selectedCard.rewardLimitSummary && (
                 <div>
-                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 mt-4">
                     回饋上限與達檻消費
                   </p>
-                  <div className={`text-xs text-[#846b12] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 glass-panel`}>
+                  <div className={`text-xs text-[#846b12] flex items-start gap-2 bg-[var(--bg-card)] p-2.5 shadow-sm border border-[#846b12]/30 rounded-md`}>
                     <Database size={16} className="text-[#846b12] mt-0.5 shrink-0" />
-                    <span className="font-sans">{selectedCard.rewardLimitSummary}</span>
+                    <span className="font-sans whitespace-pre-wrap">{selectedCard.rewardLimitSummary}</span>
                   </div>
                 </div>
               )}
