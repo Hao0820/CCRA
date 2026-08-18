@@ -239,7 +239,7 @@ export default function CardsView({
 
   const renderCardItem = (card: Card, index: number) => {
     const rotation = getRotationClass(index);
-    const spend = getCardSpend(card.id);
+    const spend = getCurrentMonthSpend(card.id);
     const bestScenario = getBestRewardScenario(card);
     const allProgress = getAllScenarioProgress(card);
 
