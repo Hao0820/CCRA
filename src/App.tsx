@@ -62,7 +62,7 @@ function hydrateCardRewards(card: Card, catalog: CreditCardCatalogItem[]): Card 
 
 export default function App() {
   // Navigation State: 'expense' | 'cards' | 'profile'
-  const [activeTab, setActiveTab] = useState<'expense' | 'cards' | 'profile'>('cards');
+  const [activeTab, setActiveTab] = useState<'expense' | 'cards' | 'profile'>('expense');
 
   // Ledger configuration
   const [cashBalance, setCashBalance] = useState(0);
@@ -693,22 +693,7 @@ export default function App() {
       <nav className={`shrink-0 pb-safe bg-[var(--bg-card)] border-t border-[var(--border-color)] select-none backdrop-blur-md`}>
         <div className="flex justify-around items-center h-20 px-4 w-full max-w-screen-md mx-auto">
           
-          {/* Tab 1: Expense */}
-          <button
-            onClick={() => setActiveTab('expense')}
-            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
-              activeTab === 'expense'
-                ? 'text-white bg-[var(--accent-primary)] shadow-[var(--shadow-glow)] border border-[var(--border-glow)] scale-105 font-bold font-sans'
-                : 'text-[var(--text-secondary)] opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
-            }`}
-          >
-            <Edit3 size={18} className="mb-0.5" />
-            <span className="text-[12px] uppercase tracking-wider">
-              消費
-            </span>
-          </button>
-
-          {/* Tab 2: Cards */}
+          {/* Tab 1: Cards */}
           <button
             onClick={() => setActiveTab('cards')}
             className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
@@ -720,6 +705,21 @@ export default function App() {
             <CreditCard size={18} className="mb-0.5" />
             <span className="text-[12px] uppercase tracking-wider">
               信用卡
+            </span>
+          </button>
+
+          {/* Tab 2: Expense */}
+          <button
+            onClick={() => setActiveTab('expense')}
+            className={`flex flex-col items-center justify-center transition-all duration-300 w-24 h-14 rounded-xl cursor-pointer ${
+              activeTab === 'expense'
+                ? 'text-white bg-[var(--accent-primary)] shadow-[var(--shadow-glow)] border border-[var(--border-glow)] scale-105 font-bold font-sans'
+                : 'text-[var(--text-secondary)] opacity-60 hover:opacity-100 hover:scale-[1.02] font-medium'
+            }`}
+          >
+            <Edit3 size={18} className="mb-0.5" />
+            <span className="text-[12px] uppercase tracking-wider">
+              消費
             </span>
           </button>
 
