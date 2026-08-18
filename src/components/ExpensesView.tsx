@@ -158,7 +158,9 @@ export default function ExpensesView({
   const filteredTransactions = transactions
     .filter((tx) => getTransactionMonthStr(tx.date) === selectedMonth)
     .filter((tx) => filterCardId === 'all' || tx.cardId === filterCardId)
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => 
+      b.date !== a.date ? b.date.localeCompare(a.date) : b.id.localeCompare(a.id)
+    );
 
   // Compute Total Expense for the selected month
   const totalExpense = filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0);
